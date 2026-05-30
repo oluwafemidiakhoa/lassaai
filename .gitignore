@@ -1,0 +1,39 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Model cache (large binaries — keep outbreak-model-v1.pkl)
+model-cache/
+*.h5
+*.onnx
+*.safetensors
+
+# Data (keep training CSVs and forecasts, exclude logs)
+data/lassa/*.log
+data/lassa/ncdc-collect.log
+data/lassa/weather-collect.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Build
+dist/
+build/

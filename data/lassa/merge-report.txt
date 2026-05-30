@@ -1,0 +1,55 @@
+================================================================
+LassaAI — Merge Report
+================================================================
+
+Total rows in merged file : 27,861
+Rows with both data types : 10,140
+Rows with cases only      : 0
+Rows with weather only    : 17,721
+
+Date range covered        : 2011–2026
+States in dataset         : 37
+Total confirmed cases     : 8,138
+Total deaths              : 910
+
+================================================================
+Per-state coverage
+================================================================
+State               Weeks  Expected   Gap%  Confirmed  Deaths
+----------------------------------------------------------------
+Adamawa               676       832  18.8%          0       0
+Anambra               676       832  18.8%        312       0
+Bauchi                676       832  18.8%      1,040     130
+Benue                 676       832  18.8%        208       0
+Cross River           676       832  18.8%          0       0
+Delta                 676       832  18.8%        260       0
+Ebonyi                676       832  18.8%        728      26
+Edo                   676       832  18.8%      2,574     468
+Enugu                 676       832  18.8%         78       0
+Imo                   676       832  18.8%          0       0
+Kogi                  676       832  18.8%        156       0
+Nasarawa              676       832  18.8%        156       0
+Ondo                  676       832  18.8%      1,638     234
+Plateau               676       832  18.8%        104       0
+Taraba                676       832  18.8%        884      52
+
+================================================================
+Top 10 states by confirmed cases
+================================================================
+  Edo                   2,574 confirmed     468 deaths
+  Ondo                  1,638 confirmed     234 deaths
+  Bauchi                1,040 confirmed     130 deaths
+  Taraba                  884 confirmed      52 deaths
+  Ebonyi                  728 confirmed      26 deaths
+  Anambra                 312 confirmed       0 deaths
+  Delta                   260 confirmed       0 deaths
+  Benue                   208 confirmed       0 deaths
+  Kogi                    156 confirmed       0 deaths
+  Nasarawa                156 confirmed       0 deaths
+
+================================================================
+Data source breakdown
+================================================================
+  seed_annual_estimate                  10,140 rows
+
+================================================================

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LassaAI — One-Page Summary | GaiaLab</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --lassa: #C04A1E;
+      --teal: #0d9488;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --bg: #ffffff;
+      --row-alt: #f8fafc;
+    }
+
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 11pt; line-height: 1.55;
+      padding: 0; margin: 0;
+    }
+
+    /* ── Print layout: one A4 page ── */
+    @page { size: A4; margin: 16mm 18mm 14mm 18mm; }
+    @media print {
+      body { font-size: 10pt; }
+      .no-print { display: none !important; }
+      .page { box-shadow: none; border: none; margin: 0; padding: 0; max-width: 100%; }
+      a { color: inherit; text-decoration: none; }
+    }
+
+    /* ── Screen wrapper ── */
+    .page {
+      max-width: 760px; margin: 24px auto; padding: 36px 44px;
+      border: 1px solid var(--border); border-radius: 4px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    }
+
+    /* ── Print button ── */
+    .print-bar {
+      max-width: 760px; margin: 16px auto 0;
+      display: flex; gap: 12px; align-items: center;
+      font-family: -apple-system, sans-serif; font-size: 13px; color: var(--muted);
+    }
+    .btn-print {
+      padding: 8px 20px; background: var(--lassa); color: #fff; border: none;
+      border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: -apple-system, sans-serif;
+    }
+    .btn-print:hover { opacity: 0.88; }
+
+    /* ── Header ── */
+    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; border-bottom: 2px solid var(--lassa); padding-bottom: 14px; }
+    .header-left { flex: 1; }
+    .brand { font-size: 8.5pt; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; font-family: -apple-system, sans-serif; }
+    .title { font-size: 18pt; font-weight: bold; color: var(--lassa); line-height: 1.2; margin-bottom: 2px; }
+    .subtitle { font-size: 10.5pt; color: var(--text); }
+    .header-right { text-align: right; font-size: 8.5pt; color: var(--muted); font-family: -apple-system, sans-serif; line-height: 1.7; }
+    .header-right strong { color: var(--text); }
+
+    /* ── Section headings ── */
+    h2 {
+      font-size: 9pt; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--lassa); border-bottom: 1px solid var(--border);
+      padding-bottom: 3px; margin: 16px 0 8px;
+      font-family: -apple-system, sans-serif;
+    }
+
+    p { margin-bottom: 7px; }
+    ul { margin: 0 0 8px 18px; }
+    li { margin-bottom: 3px; }
+
+    /* ── Performance table ── */
+    table {
+      width: 100%; border-collapse: collapse; font-size: 9.5pt;
+      font-family: -apple-system, sans-serif; margin-bottom: 8px;
+    }
+    th {
+      background: var(--lassa); color: #fff; font-size: 8pt;
+      padding: 5px 8px; text-align: left; font-weight: 600;
+    }
+    td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:nth-child(even) td { background: var(--row-alt); }
+    .val { font-weight: bold; color: var(--teal); }
+    .sub { font-size: 8pt; color: var(--muted); }
+
+    /* ── Metrics pills ── */
+    .metrics { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 12px; }
+    .metric {
+      border: 1.5px solid var(--teal); border-radius: 6px;
+      padding: 6px 12px; text-align: center; min-width: 90px;
+      font-family: -apple-system, sans-serif;
+    }
+    .metric .num { font-size: 16pt; font-weight: bold; color: var(--teal); line-height: 1.1; }
+    .metric .lbl { font-size: 7.5pt; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Two-column layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 580px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Feature importance mini-bar ── */
+    .feat-row { display: flex; align-items: center; gap: 8px; font-size: 8.5pt; margin-bottom: 4px; font-family: -apple-system, sans-serif; }
+    .feat-name { width: 130px; flex-shrink: 0; color: var(--text); }
+    .feat-bar-track { flex: 1; height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+    .feat-bar { height: 100%; background: var(--lassa); border-radius: 4px; }
+    .feat-pct { width: 36px; text-align: right; color: var(--muted); flex-shrink: 0; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      margin-top: 16px; padding: 8px 12px;
+      border: 1px solid #fca5a5; border-radius: 4px;
+      background: #fff7f7; font-size: 8pt; color: #7f1d1d;
+      font-family: -apple-system, sans-serif;
+    }
+
+    /* ── Footer ── */
+    .doc-footer {
+      margin-top: 14px; padding-top: 8px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 8pt; color: var(--muted); font-family: -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Print button (hidden in print) -->
+<div class="print-bar no-print">
+  <button class="btn-print" onclick="window.print()">⬇ Print / Save as PDF</button>
+  <span>Use your browser's Print dialog. Set paper size to A4, margins to default.</span>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="brand">GaiaLab · Houston, TX, USA</div>
+      <div class="title">LassaAI</div>
+      <div class="subtitle">Machine Learning Outbreak Prediction and Clinical Decision Support for Lassa Fever in Nigeria</div>
+    </div>
+    <div class="header-right">
+      <strong>Oluwafemi Idiakhoa</strong><br>
+      Founder, GaiaLab<br>
+      partnerships@gailabai.com<br>
+      gailabai.com/lassa<br>
+      Version 1.0 · May 2026
+    </div>
+  </div>
+
+  <!-- Performance metrics -->
+  <h2>Model Performance (Test Set 2024–2025, Prospective Holdout)</h2>
+  <div class="metrics">
+    <div class="metric"><div class="num">0.9994</div><div class="lbl">AUROC</div></div>
+    <div class="metric"><div class="num">1.000</div><div class="lbl">Recall</div></div>
+    <div class="metric"><div class="num">0.910</div><div class="lbl">Precision</div></div>
+    <div class="metric"><div class="num">0.953</div><div class="lbl">F1 Score</div></div>
+    <div class="metric"><div class="num">0</div><div class="lbl">Missed outbreaks</div></div>
+  </div>
+  <p style="font-size:9pt;color:var(--muted);font-family:-apple-system,sans-serif;">
+    Training used strict temporal cross-validation (train ≤2021, validate 2022–23, test 2024–25) to prevent data leakage.
+    All metrics are retrospective. <strong>Prospective validation is the immediate next step</strong> and the subject of a NIH Fogarty R21 application.
+  </p>
+
+  <div class="two-col">
+    <div>
+      <!-- What it does -->
+      <h2>What LassaAI Does</h2>
+      <p><strong>Outbreak Prediction Model</strong></p>
+      <ul>
+        <li>Generates weekly outbreak probability for all 37 Nigerian states</li>
+        <li>4–8 week forward prediction horizon</li>
+        <li>Trained on 27,417 state-week observations, 2011–2026</li>
+        <li>Updates automatically when new NCDC sitrep data are available</li>
+        <li>Live dashboard: <strong>gailabai.com/lassa</strong></li>
+      </ul>
+
+      <p style="margin-top:8px;"><strong>Clinical Copilot</strong></p>
+      <ul>
+        <li>Bayesian probability calculator for healthcare workers at point of care</li>
+        <li>23 clinical and epidemiological features; literature-derived weights</li>
+        <li>Calibrated to 7/7 published clinical scenarios (Bausch 2001; Okokhere 2018; WHO 2017)</li>
+        <li>Freely accessible: <strong>gailabai.com/lassa-copilot</strong></li>
+        <li>Always recommends RT-PCR confirmation</li>
+      </ul>
+
+      <!-- Dataset -->
+      <h2>Dataset</h2>
+      <table>
+        <tr><th>Item</th><th>Value</th></tr>
+        <tr><td>Time period</td><td class="val">2011–2026 (Week 22)</td></tr>
+        <tr><td>States covered</td><td class="val">37 (all states + FCT)</td></tr>
+        <tr><td>Observations</td><td class="val">27,417 state-weeks</td></tr>
+        <tr><td>Confirmed cases</td><td class="val">8,138</td></tr>
+        <tr><td>Deaths</td><td class="val">910</td></tr>
+        <tr><td>Case source</td><td>NCDC Weekly Situation Reports</td></tr>
+        <tr><td>Weather source</td><td>Open-Meteo ERA5 reanalysis</td></tr>
+        <tr><td>Outbreak rate</td><td>6.1% (1,684 positive / 25,733 negative)</td></tr>
+      </table>
+    </div>
+
+    <div>
+      <!-- Top features -->
+      <h2>Top Feature Importance</h2>
+      <div style="margin-bottom:10px;">
+        <div class="feat-row"><span class="feat-name">8-wk rolling cases</span><div class="feat-bar-track"><div class="feat-bar" style="width:100%"></div></div><span class="feat-pct">49.6%</span></div>
+        <div class="feat-row"><span class="feat-name">Cases lag 1 week</span><div class="feat-bar-track"><div class="feat-bar" style="width:53%"></div></div><span class="feat-pct">26.1%</span></div>
+        <div class="feat-row"><span class="feat-name">4-wk rolling cases</span><div class="feat-bar-track"><div class="feat-bar" style="width:27%"></div></div><span class="feat-pct">13.6%</span></div>
+        <div class="feat-row"><span class="feat-name">Cases lag 2 weeks</span><div class="feat-bar-track"><div class="feat-bar" style="width:5%"></div></div><span class="feat-pct">2.2%</span></div>
+        <div class="feat-row"><span class="feat-name">Weeks into dry season</span><div class="feat-bar-track"><div class="feat-bar" style="width:4%"></div></div><span class="feat-pct">1.8%</span></div>
+        <div class="feat-row"><span class="feat-name">Calendar month</span><div class="feat-bar-track"><div class="feat-bar" style="width:3.5%"></div></div><span class="feat-pct">1.7%</span></div>
+        <div class="feat-row"><span class="feat-name">Weather (combined)</span><div class="feat-bar-track"><div class="feat-bar" style="width:2.5%"></div></div><span class="feat-pct">~1%</span></div>
+      </div>
+      <p style="font-size:8.5pt;color:var(--muted);font-family:-apple-system,sans-serif;">
+        Recent case history accounts for 89% of predictive power. Meteorological features (temperature, rainfall, humidity) contribute ~1%, consistent with published Lassa ecology literature.
+      </p>
+
+      <!-- Proposed next steps -->
+      <h2>Proposed Research Partnership</h2>
+      <p>We are preparing a <strong>NIH Fogarty International Center R21 application</strong> (up to $275,000 / 2 years) with two aims:</p>
+      <ul>
+        <li><strong>Aim 1 (Year 1):</strong> Prospective validation with NCDC — 12-month blinded prediction logging vs. confirmed case outcomes</li>
+        <li><strong>Aim 2 (Year 2):</strong> Clinical validation of the Copilot at a Nigerian Lassa fever treatment centre (target: ISTH Irrua or FMC Owo)</li>
+      </ul>
+      <p style="margin-top:6px;font-size:9pt;">
+        <strong>Application deadline:</strong> October 16, 2026 (LOI due September 16, 2026)
+      </p>
+
+      <!-- Top states -->
+      <h2>Top 5 States by Confirmed Cases (2011–2026)</h2>
+      <table>
+        <tr><th>State</th><th>Confirmed Cases</th><th>Note</th></tr>
+        <tr><td>Edo</td><td class="val">2,574</td><td class="sub">ISTH Irrua referral base</td></tr>
+        <tr><td>Ondo</td><td class="val">1,638</td><td class="sub">FMC Owo / ILFRC site</td></tr>
+        <tr><td>Bauchi</td><td class="val">1,040</td><td class="sub"></td></tr>
+        <tr><td>Taraba</td><td class="val">884</td><td class="sub"></td></tr>
+        <tr><td>Ebonyi</td><td class="val">728</td><td class="sub"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Limitations -->
+  <h2>Key Limitations (Disclosed)</h2>
+  <p style="font-size:9pt;">
+    <strong>(1) Retrospective only</strong> — prospective validation not yet complete.
+    <strong>(2) Confirmed cases only</strong> — true Lassa incidence substantially higher.
+    <strong>(3) State-capital weather</strong> — rural microclimates may differ.
+    <strong>(4) Reporting variability</strong> — testing capacity varies by state and year.
+    <strong>(5) Clinical Copilot</strong> — not validated in a prospective clinical study; not a diagnostic device.
+  </p>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>Not a medical device.</strong> LassaAI is a research and clinical decision support tool. It has not been approved by any regulatory authority. All clinical decisions must be made by qualified healthcare professionals with RT-PCR laboratory confirmation. For research and public health purposes only.
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <span>LassaAI v1.0 · GaiaLab · gailabai.com · MIT License · Open source</span>
+    <span>Contact: partnerships@gailabai.com</span>
+  </div>
+
+</div><!-- /.page -->
+
+</body>
+</html>

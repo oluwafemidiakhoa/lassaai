@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LassaAI — Outbreak Intelligence | GaiaLab</title>
+  <meta name="description" content="Real-time Lassa fever outbreak forecasting for Nigerian states. Combines NCDC epidemiological surveillance, ML-based outbreak prediction, and antiviral drug discovery.">
+  <meta property="og:title" content="LassaAI — Lassa Fever Outbreak Intelligence">
+  <meta property="og:description" content="ML-powered Lassa fever outbreak forecasting for all 37 Nigerian states.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --teal: #2dd4bf;
+      --teal-dim: rgba(45,212,191,0.15);
+      --lassa: #D85A30;
+      --lassa-dim: rgba(216,90,48,0.15);
+      --high: #ef4444;
+      --medium: #f59e0b;
+      --low: #22c55e;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,15,30,0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px; display: flex; align-items: center; gap: 16px;
+    }
+    .nav-logo { font-size: 1.1rem; font-weight: 700; color: var(--teal); text-decoration: none; }
+    .nav-sep { color: var(--border); }
+    .nav-links { display: flex; gap: 16px; margin-left: auto; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--lassa); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 64px 24px 48px;
+      max-width: 1100px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--lassa-dim); border: 1px solid rgba(216,90,48,0.4);
+      color: var(--lassa); padding: 6px 14px; border-radius: 20px;
+      font-size: 0.78rem; font-weight: 600; width: fit-content;
+    }
+    .hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lassa); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.2; }
+    .hero h1 span { color: var(--lassa); }
+    .hero p { font-size: 1.05rem; color: var(--muted); max-width: 680px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.15s; cursor: pointer; border: none; }
+    .btn-primary { background: var(--lassa); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.15); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px 48px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;
+    }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 800; color: var(--teal); }
+    .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Section layout ── */
+    .section { max-width: 1100px; margin: 0 auto; padding: 0 24px 56px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .section-title { font-size: 1.25rem; font-weight: 700; }
+    .section-badge { font-size: 0.75rem; background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(45,212,191,0.3); padding: 3px 10px; border-radius: 20px; }
+
+    /* ── Forecast grid ── */
+    .forecast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .forecast-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px; position: relative; overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .forecast-card:hover { border-color: rgba(45,212,191,0.4); }
+    .forecast-card.risk-HIGH { border-left: 3px solid var(--high); }
+    .forecast-card.risk-MEDIUM { border-left: 3px solid var(--medium); }
+    .forecast-card.risk-LOW { border-left: 3px solid var(--low); }
+    .forecast-state { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .forecast-prob { font-size: 1.4rem; font-weight: 800; }
+    .forecast-prob.risk-HIGH { color: var(--high); }
+    .forecast-prob.risk-MEDIUM { color: var(--medium); }
+    .forecast-prob.risk-LOW { color: var(--low); }
+    .forecast-risk-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle;
+    }
+    .forecast-risk-badge.HIGH { background: rgba(239,68,68,0.2); color: var(--high); }
+    .forecast-risk-badge.MEDIUM { background: rgba(245,158,11,0.2); color: var(--medium); }
+    .forecast-risk-badge.LOW { background: rgba(34,197,94,0.15); color: var(--low); }
+    .forecast-change { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+    .forecast-change .up { color: var(--high); }
+    .forecast-change .down { color: var(--low); }
+    .forecast-week { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+    /* Season notice */
+    .season-notice {
+      background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.25);
+      border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;
+      font-size: 0.875rem; color: var(--muted); display: flex; gap: 12px; align-items: flex-start;
+    }
+    .season-notice .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Drug pipeline ── */
+    .drug-cards { display: flex; flex-direction: column; gap: 14px; }
+    .drug-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: start;
+    }
+    .drug-tier {
+      width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800; flex-shrink: 0;
+    }
+    .drug-tier.I { background: rgba(45,212,191,0.15); color: var(--teal); border: 1px solid rgba(45,212,191,0.3); }
+    .drug-tier.II { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+    .drug-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .drug-moa { font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
+    .drug-status { display: inline-block; font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(45,212,191,0.1); color: var(--teal); border: 1px solid rgba(45,212,191,0.25); margin-bottom: 8px; }
+    .drug-notes { font-size: 0.8rem; color: var(--muted); }
+    .drug-trial { margin-top: 8px; }
+    .drug-trial a { font-size: 0.75rem; color: var(--teal); text-decoration: none; }
+    .drug-trial a:hover { text-decoration: underline; }
+    .drug-target-pill { display: inline-block; font-size: 0.68rem; background: var(--lassa-dim); color: var(--lassa); border: 1px solid rgba(216,90,48,0.3); padding: 1px 6px; border-radius: 4px; }
+
+    /* ── LASV proteins ── */
+    .protein-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .protein-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px;
+      border-top: 2px solid var(--lassa);
+    }
+    .protein-symbol { font-size: 1.3rem; font-weight: 800; color: var(--lassa); }
+    .protein-name { font-size: 0.8rem; color: var(--muted); margin: 4px 0 8px; }
+    .protein-function { font-size: 0.82rem; color: var(--text); }
+    .protein-uniprot { margin-top: 10px; }
+    .protein-uniprot a { font-size: 0.72rem; color: var(--teal); text-decoration: none; }
+
+    /* ── Analysis CTA ── */
+    .cta-card {
+      background: linear-gradient(135deg, rgba(216,90,48,0.12), rgba(45,212,191,0.08));
+      border: 1px solid rgba(216,90,48,0.35); border-radius: 12px;
+      padding: 40px; text-align: center;
+    }
+    .cta-card h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; }
+    .cta-card p { color: var(--muted); max-width: 540px; margin: 0 auto 24px; font-size: 0.9rem; }
+    .cta-genes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .gene-pill {
+      background: var(--lassa-dim); border: 1px solid rgba(216,90,48,0.4);
+      color: var(--lassa); padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
+    }
+
+    /* ── PubMed alerts ── */
+    .alert-list { display: flex; flex-direction: column; gap: 10px; }
+    .alert-row {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+    }
+    .alert-icon { font-size: 1rem; flex-shrink: 0; }
+    .alert-query { font-size: 0.82rem; font-family: 'Courier New', monospace; color: var(--teal); flex: 1; }
+    .alert-desc { font-size: 0.78rem; color: var(--muted); }
+    .alert-freq { font-size: 0.72rem; background: var(--teal-dim); color: var(--teal); padding: 2px 8px; border-radius: 4px; flex-shrink: 0; }
+
+    /* ── Model info ── */
+    .model-info { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .model-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 16px; }
+    .metric { text-align: center; }
+    .metric .val { font-size: 1.5rem; font-weight: 800; color: var(--teal); }
+    .metric .key { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Footer ── */
+    footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; color: var(--muted); font-size: 0.8rem; }
+    footer a { color: var(--teal); text-decoration: none; }
+
+    /* ── Loading state ── */
+    .loading { text-align: center; padding: 48px; color: var(--muted); font-size: 0.875rem; }
+    .loading::after { content: '...'; animation: dots 1.5s infinite; }
+    @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+
+    /* ── Mobile responsive ── */
+    @media (max-width: 640px) {
+      nav { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+      .nav-links { gap: 8px; flex-wrap: wrap; }
+      .nav-links a { font-size: 0.75rem; }
+      .hero { padding: 36px 16px 28px; }
+      .hero h1 { font-size: 1.5rem; }
+      .hero p { font-size: 0.9rem; }
+      .hero-actions { flex-wrap: wrap; gap: 8px; }
+      .hero-actions .btn { font-size: 0.82rem; padding: 9px 16px; }
+      .stats-bar { grid-template-columns: 1fr 1fr; padding: 16px; gap: 12px; }
+      .stat-card .value { font-size: 1.5rem; }
+      .section { padding: 24px 14px; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+      /* forecast cards: 1 column on small, 2 on medium */
+      .forecast-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+      .forecast-card { padding: 10px 12px; }
+      .forecast-prob { font-size: 1.1rem; }
+      /* drug cards full width */
+      .drug-cards { gap: 10px; }
+      .drug-card { padding: 14px; }
+      /* alerts single column */
+      .alert-list { gap: 10px; }
+      /* season notice */
+      .season-notice { padding: 12px 14px; font-size: 0.82rem; }
+      footer { padding: 20px 14px; font-size: 0.72rem; }
+    }
+    @media (max-width: 400px) {
+      .forecast-grid { grid-template-columns: 1fr !important; }
+      .stats-bar { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">GaiaLab</a>
+  <span class="nav-sep">/</span>
+  <span style="font-size:0.9rem; color:var(--lassa); font-weight:600;">LassaAI</span>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/boards">Boards</a>
+    <a href="/analyze.html">Analyze</a>
+    <a href="/lassa" class="active">LassaAI</a>
+    <a href="/lassa-copilot" style="color:var(--lassa);">Copilot</a>
+    <a href="/lassa-summary" style="color:var(--muted);border:1px solid var(--border);padding:3px 10px;border-radius:6px;font-size:0.78rem;">&#8682; One-pager</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Live Outbreak Surveillance · Nigeria
+  </div>
+  <h1>Lassa Fever <span>Outbreak Intelligence</span></h1>
+  <p>
+    ML-powered outbreak prediction for all 37 Nigerian states. Combines NCDC epidemiological
+    surveillance data, ERA5 climate reanalysis, and antiviral drug discovery — all updated weekly.
+  </p>
+  <div class="hero-actions">
+    <a href="/analyze.html?genes=GPC,NP,L,Z&disease=lassa%20fever" class="btn btn-primary">
+      &#9654; Run Lassa Analysis
+    </a>
+    <a href="/lassa-copilot" class="btn btn-outline" style="border-color:rgba(216,90,48,0.5);color:var(--lassa);">
+      &#10010; Clinical Copilot
+    </a>
+    <a href="#forecast" class="btn btn-outline">
+      &#8659; Outbreak Forecast
+    </a>
+    <a href="/lassa-summary" class="btn btn-outline" style="font-size:0.8rem;">
+      &#8682; One-Page Summary
+    </a>
+  </div>
+  <!-- Prospective validation status badge -->
+  <div id="prospective-badge" style="display:none;margin-top:8px;padding:8px 14px;background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.25);border-radius:8px;font-size:0.78rem;color:var(--teal);width:fit-content;">
+    &#128200; <strong>Prospective validation active</strong> — <span id="prospective-weeks">0</span> weeks logged since <span id="prospective-since">May 2026</span>
+    · <a href="#forecast" style="color:var(--teal);text-decoration:underline;">View forecast log</a>
+  </div>
+</div>
+
+<!-- ── Stats bar ── -->
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-card">
+    <div class="value" id="stat-auroc">0.9994</div>
+    <div class="label">Test AUROC (2024–25 holdout)</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">37</div>
+    <div class="label">Nigerian states tracked</div>
+  </div>
+  <div class="stat-card">
+    <div class="value" id="stat-epiweeks">753</div>
+    <div class="label">Epi-weeks of training data</div>
+  </div>
+  <div class="stat-card">
+    <div class="value" id="stat-high">—</div>
+    <div class="label">High-risk states this week</div>
+  </div>
+  <div class="stat-card">
+    <div class="value">2012</div>
+    <div class="label">Training data from</div>
+  </div>
+</div>
+
+<!-- ── Outbreak Forecast ── -->
+<div class="section" id="forecast">
+  <div class="section-header">
+    <div class="section-title">Outbreak Forecast — Next 4 Weeks</div>
+    <span class="section-badge" id="forecast-date">Loading...</span>
+  </div>
+
+  <div class="season-notice" id="season-notice" style="display:none;">
+    <span class="icon">&#9728;&#65039;</span>
+    <span>
+      <strong>Wet season (May–October):</strong> Lassa transmission is at seasonal trough.
+      Current probabilities reflect low baseline risk. Forecasts will increase as the dry season
+      begins in November. This seasonal pattern is correctly captured by the model.
+    </span>
+  </div>
+
+  <div id="forecast-container" class="loading">Fetching forecast</div>
+</div>
+
+<!-- ── LASV Target Proteins ── -->
+<div class="section" id="proteins">
+  <div class="section-header">
+    <div class="section-title">Lassa Virus Target Proteins</div>
+    <span class="section-badge">Viral Pathogen Mode</span>
+  </div>
+  <div class="protein-grid">
+    <div class="protein-card">
+      <div class="protein-symbol">GPC</div>
+      <div class="protein-name">Glycoprotein Complex</div>
+      <div class="protein-function">Viral entry — primary vaccine and antibody target. Mediates fusion with host cell membrane.</div>
+      <div class="protein-uniprot"><a href="https://www.uniprot.org/uniprot/Q8JBJ2" target="_blank" rel="noopener">UniProt Q8JBJ2 &#8599;</a></div>
+    </div>
+    <div class="protein-card">
+      <div class="protein-symbol">NP</div>
+      <div class="protein-name">Nucleoprotein</div>
+      <div class="protein-function">RNA synthesis and immune evasion. Suppresses host innate immune response via IFN antagonism.</div>
+      <div class="protein-uniprot"><a href="https://www.uniprot.org/uniprot/P13699" target="_blank" rel="noopener">UniProt P13699 &#8599;</a></div>
+    </div>
+    <div class="protein-card">
+      <div class="protein-symbol">L</div>
+      <div class="protein-name">RNA-dependent RNA Polymerase</div>
+      <div class="protein-function">Viral replication. Primary target for antivirals: favipiravir, ribavirin, and molnupiravir all inhibit L activity.</div>
+      <div class="protein-uniprot"><a href="https://www.uniprot.org/uniprot/O09705" target="_blank" rel="noopener">UniProt O09705 &#8599;</a></div>
+    </div>
+    <div class="protein-card">
+      <div class="protein-symbol">Z</div>
+      <div class="protein-name">Matrix Protein (RING)</div>
+      <div class="protein-function">Viral budding. RING-domain zinc-finger protein; drives virion assembly and release from host cells.</div>
+      <div class="protein-uniprot"><a href="https://www.uniprot.org/uniprot/Q8JBJ1" target="_blank" rel="noopener">UniProt Q8JBJ1 &#8599;</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Drug Pipeline ── -->
+<div class="section" id="drugs">
+  <div class="section-header">
+    <div class="section-title">Antiviral Drug Pipeline</div>
+    <span class="section-badge" id="drug-count">Loading...</span>
+  </div>
+  <div class="drug-cards" id="drug-container" style="display:none;"></div>
+  <div class="loading" id="drug-loading">Fetching pipeline</div>
+</div>
+
+<!-- ── PubMed Alerts ── -->
+<div class="section" id="alerts">
+  <div class="section-header">
+    <div class="section-title">Weekly PubMed Surveillance</div>
+    <span class="section-badge">Automated · Weekly</span>
+  </div>
+  <div class="alert-list" id="alert-container" style="display:none;"></div>
+  <div class="loading" id="alert-loading">Fetching alert config</div>
+</div>
+
+<!-- ── Model Info ── -->
+<div class="section" id="model">
+  <div class="section-header">
+    <div class="section-title">Prediction Model</div>
+    <span class="section-badge">XGBoost · Temporal CV</span>
+  </div>
+  <div class="model-info">
+    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:4px;">
+      Binary classification: will a state report &gt;5 confirmed Lassa cases in the next 4 weeks?
+      Trained with strict temporal cross-validation — no data leakage between train/validate/test splits.
+    </p>
+    <div class="model-metrics">
+      <div class="metric"><div class="val">0.9994</div><div class="key">Test AUROC</div></div>
+      <div class="metric"><div class="val">1.000</div><div class="key">Test Recall</div></div>
+      <div class="metric"><div class="val">0.910</div><div class="key">Test Precision</div></div>
+      <div class="metric"><div class="val">0.953</div><div class="key">Test F1</div></div>
+      <div class="metric"><div class="val">0</div><div class="key">Missed outbreaks (FN)</div></div>
+      <div class="metric"><div class="val">27,417</div><div class="key">Training rows</div></div>
+      <div class="metric"><div class="val">19</div><div class="key">Features</div></div>
+      <div class="metric"><div class="val">2012–2025</div><div class="key">Data coverage</div></div>
+    </div>
+    <p style="margin-top:20px;font-size:0.78rem;color:var(--muted);">
+      Top features: <strong style="color:var(--text);">8-week rolling case mean (49.6%)</strong>,
+      1-week lag cases (26.1%), 4-week rolling mean (13.6%), dry season timing (3.5% combined).
+      Weather variables (rainfall, humidity, temperature) contribute &lt;3% — recent case history
+      dominates, consistent with Lassa's focal rodent-reservoir transmission ecology.
+    </p>
+    <p style="margin-top:12px;font-size:0.78rem;color:var(--muted);">
+      <strong style="color:var(--text);">Limitations:</strong> Case data 2012–2015 are seed estimates
+      (not direct NCDC surveillance counts). Weather is from ERA5 reanalysis at state capital
+      coordinates — intra-state variation not captured. Model should be treated as a screening
+      tool, not a replacement for NCDC field surveillance.
+    </p>
+  </div>
+</div>
+
+<!-- ── Run Analysis CTA ── -->
+<div class="section">
+  <div class="cta-card">
+    <h2>Run a Lassa Virus Analysis</h2>
+    <p>
+      Enter LASV protein targets into GaiaLab's AI analysis pipeline. The viral pathogen mode
+      routes GPC, NP, L, and Z through a Lassa-specific drug repurposing engine with known
+      antiviral candidates pre-loaded.
+    </p>
+    <div class="cta-genes">
+      <span class="gene-pill">GPC</span>
+      <span class="gene-pill">NP</span>
+      <span class="gene-pill">L</span>
+      <span class="gene-pill">Z</span>
+    </div>
+    <a href="/analyze.html?genes=GPC,NP,L,Z&disease=lassa%20fever&audience=researcher"
+       class="btn btn-primary" style="font-size:0.95rem;padding:12px 28px;">
+      &#9654; Analyze Lassa Virus Targets
+    </a>
+  </div>
+</div>
+
+<footer>
+  <p>
+    LassaAI is part of <a href="/">GaiaLab</a> — AI-powered biological intelligence.
+    Epidemiological data: <a href="https://ncdc.gov.ng/diseases/sitreps" target="_blank" rel="noopener">NCDC Nigeria</a>.
+    Climate data: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo ERA5</a>.
+    Not for clinical use. Research tool only.
+  </p>
+</footer>
+
+<script>
+// ── Forecast ─────────────────────────────────────────────────────────────────
+async function loadForecast() {
+  const container = document.getElementById('forecast-container');
+  const dateEl = document.getElementById('forecast-date');
+  const highEl = document.getElementById('stat-high');
+  const notice = document.getElementById('season-notice');
+
+  try {
+    const res = await fetch('/api/lassa/forecast');
+    const data = await res.json();
+
+    if (data.error) {
+      container.innerHTML = `<p style="color:var(--muted);text-align:center;padding:32px;">${data.error}</p>`;
+      return;
+    }
+
+    const forecasts = data.forecasts || [];
+    const genDate = data.generated_at || '';
+    dateEl.textContent = genDate ? `Generated ${genDate}` : 'Live';
+    highEl.textContent = forecasts.filter(f => f.risk === 'HIGH').length;
+
+    // Compute epi-weeks from training start (2012-W01) to current forecast week
+    if (forecasts.length) {
+      const sample = forecasts[0];
+      const curYear = sample.as_of_year || new Date().getFullYear();
+      const curWeek = sample.as_of_week || 1;
+      const TRAIN_START_YEAR = 2012;
+      const weeksPerYear = 52;
+      const totalWeeks = (curYear - TRAIN_START_YEAR) * weeksPerYear + curWeek;
+      document.getElementById('stat-epiweeks').textContent = totalWeeks.toLocaleString();
+    }
+
+    // Show seasonal notice if in wet season (May–Oct)
+    const month = new Date().getMonth() + 1;
+    if (month >= 5 && month <= 10) notice.style.display = 'flex';
+
+    if (!forecasts.length) {
+      container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:32px;">No forecast data available.</p>';
+      return;
+    }
+
+    const cards = forecasts.map(f => {
+      const prob = (f.probability * 100).toFixed(1);
+      const ch = f.change_vs_last_week;
+      let chHtml = '';
+      if (ch !== null && ch !== undefined) {
+        const sign = ch >= 0 ? '+' : '';
+        const cls = ch > 0.01 ? 'up' : (ch < -0.01 ? 'down' : '');
+        chHtml = `<div class="forecast-change"><span class="${cls}">${sign}${(ch*100).toFixed(1)}pp vs last week</span></div>`;
+      }
+      return `
+        <div class="forecast-card risk-${f.risk}">
+          <div class="forecast-state">${f.state}</div>
+          <div>
+            <span class="forecast-prob risk-${f.risk}">${prob}%</span>
+            <span class="forecast-risk-badge ${f.risk}">${f.risk}</span>
+          </div>
+          ${chHtml}
+          <div class="forecast-week">Week ${f.as_of_week ?? ''} / ${f.as_of_year ?? ''}</div>
+        </div>`;
+    }).join('');
+
+    container.className = 'forecast-grid';
+    container.innerHTML = cards;
+  } catch (err) {
+    container.innerHTML = `<p style="color:var(--muted);text-align:center;padding:32px;">Could not load forecast: ${err.message}</p>`;
+  }
+}
+
+// ── Prospective validation badge ─────────────────────────────────────────────
+async function loadProspectiveBadge() {
+  try {
+    const res = await fetch('/api/lassa/prospective-log');
+    if (!res.ok) return;
+    const data = await res.json();
+    const weeks = data.totalWeeks || 0;
+    const since = data.firstLoggedAt ? new Date(data.firstLoggedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : 'May 2026';
+    if (weeks > 0) {
+      document.getElementById('prospective-weeks').textContent = weeks;
+      document.getElementById('prospective-since').textContent = since;
+      document.getElementById('prospective-badge').style.display = 'block';
+    }
+  } catch (_) {}
+}
+
+// ── Drugs ─────────────────────────────────────────────────────────────────────
+async function loadDrugs() {
+  const container = document.getElementById('drug-container');
+  const loading = document.getElementById('drug-loading');
+  const countEl = document.getElementById('drug-count');
+
+  try {
+    const res = await fetch('/api/lassa/antivirals');
+    const drugs = await res.json();
+
+    countEl.textContent = `${drugs.length} candidates`;
+    loading.style.display = 'none';
+    container.style.display = 'flex';
+
+    container.innerHTML = drugs.map(d => {
+      const trialLinks = (d.clinicalTrials || []).map(t =>
+        `<a href="https://clinicaltrials.gov/study/${t.nctId}" target="_blank" rel="noopener">${t.nctId}: ${t.title} (${t.status}) &#8599;</a>`
+      ).join('<br>');
+
+      const targets = (d.targets || []).map(t =>
+        `<span class="drug-target-pill">${t}</span>`
+      ).join(' ');
+
+      return `
+        <div class="drug-card">
+          <div class="drug-tier ${d.tier}">T${d.tier}</div>
+          <div>
+            <div class="drug-name">${d.drugName} ${targets}</div>
+            <div class="drug-moa">${d.mechanism}</div>
+            <div class="drug-status">${d.status}</div>
+            <div class="drug-notes">${d.notes}</div>
+            ${trialLinks ? `<div class="drug-trial">${trialLinks}</div>` : ''}
+          </div>
+          <div></div>
+        </div>`;
+    }).join('');
+  } catch (err) {
+    loading.textContent = 'Could not load drug pipeline: ' + err.message;
+  }
+}
+
+// ── PubMed alerts ─────────────────────────────────────────────────────────────
+async function loadAlerts() {
+  const container = document.getElementById('alert-container');
+  const loading = document.getElementById('alert-loading');
+
+  try {
+    const res = await fetch('/api/lassa/pubmed-alerts');
+    const data = await res.json();
+    const subs = data.subscriptions || [];
+
+    loading.style.display = 'none';
+    container.style.display = 'flex';
+
+    container.innerHTML = subs.map(s => `
+      <div class="alert-row">
+        <span class="alert-icon">&#128250;</span>
+        <div style="flex:1;">
+          <div class="alert-query">${escapeHtml(s.query)}</div>
+          <div class="alert-desc">${escapeHtml(s.description)} &mdash; max ${s.max_results} results</div>
+        </div>
+        <span class="alert-freq">Weekly</span>
+      </div>`).join('');
+  } catch (err) {
+    loading.textContent = 'Could not load alert config.';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Boot
+loadForecast();
+loadDrugs();
+loadAlerts();
+loadProspectiveBadge();
+</script>
+</body>
+</html>

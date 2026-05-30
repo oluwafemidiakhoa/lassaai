@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lassa Fever Clinical Copilot | GaiaLab</title>
+  <meta name="description" content="Symptom-based Lassa fever probability scoring for healthcare workers in Nigeria. Clinical decision support only — not a diagnostic device.">
+  <script src="/nav.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --teal: #2dd4bf;
+      --teal-dim: rgba(45,212,191,0.15);
+      --lassa: #D85A30;
+      --lassa-dim: rgba(216,90,48,0.15);
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+    #site-nav { position: sticky; top: 0; z-index: 100; }
+    .page-wrap { max-width: 800px; margin: 0 auto; padding: 0 20px 80px; }
+
+    /* Hero */
+    .hero { padding: 56px 0 36px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--lassa-dim); border: 1px solid rgba(216,90,48,0.35);
+      color: var(--lassa); font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; }
+    .hero h1 span { color: var(--lassa); }
+    .hero-sub { font-size: 1rem; color: var(--muted); max-width: 560px; }
+
+    /* Warning box */
+    .warning-box {
+      background: rgba(239,68,68,0.08);
+      border: 1.5px solid rgba(239,68,68,0.4);
+      border-radius: 10px; padding: 18px 20px; margin-bottom: 28px;
+    }
+    .warning-box__title { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #fca5a5; margin-bottom: 10px; }
+    .warning-box p { font-size: 0.875rem; color: #fecaca; line-height: 1.6; margin-bottom: 6px; }
+    .warning-box p:last-child { margin-bottom: 0; }
+    .warning-box strong { color: #fff; }
+    .ncdc-hotline { display: inline-flex; align-items: center; gap: 6px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; font-weight: 700; font-size: 0.85rem; padding: 6px 14px; border-radius: 6px; margin-top: 8px; text-decoration: none; }
+
+    /* Form card */
+    .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin-bottom: 20px; }
+    .form-card__title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal); margin-bottom: 18px; }
+    .form-row { margin-bottom: 16px; }
+    .form-row label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    .form-row select, .form-row input[type="number"] { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 0.875rem; padding: 9px 12px; border-radius: 7px; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
+    .form-row select:focus, .form-row input[type="number"]:focus { border-color: var(--teal); }
+    .form-row select option { background: #1e293b; }
+
+    /* Checkbox grid */
+    .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 540px) { .cb-grid { grid-template-columns: 1fr; } }
+    .cb-item { display: flex; align-items: flex-start; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none; }
+    .cb-item:hover { border-color: rgba(45,212,191,0.4); }
+    .cb-item input[type="checkbox"] { width: 15px; height: 15px; min-width: 15px; margin-top: 2px; accent-color: var(--teal); cursor: pointer; }
+    .cb-item.checked { background: rgba(45,212,191,0.07); border-color: rgba(45,212,191,0.35); }
+    .cb-label { font-size: 0.825rem; color: var(--muted); line-height: 1.4; }
+    .cb-item.checked .cb-label { color: var(--text); }
+
+    /* Radio */
+    .radio-row { display: flex; gap: 12px; }
+    .radio-item { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 10px 14px; cursor: pointer; font-size: 0.825rem; color: var(--muted); transition: border-color 0.15s, background 0.15s; }
+    .radio-item:hover { border-color: rgba(45,212,191,0.4); }
+    .radio-item input[type="radio"] { accent-color: var(--teal); }
+    .radio-item.selected { background: var(--teal-dim); border-color: rgba(45,212,191,0.45); color: var(--teal); }
+
+    /* Button */
+    .btn-calculate { width: 100%; padding: 14px; border-radius: 9px; border: none; background: var(--lassa); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; margin-top: 8px; }
+    .btn-calculate:hover { opacity: 0.88; }
+
+    /* Results */
+    #results { display: none; margin-top: 8px; }
+    .results-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin-bottom: 20px; }
+    .results-card__title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 18px; }
+
+    .prob-score-wrap { display: flex; align-items: center; gap: 24px; margin-bottom: 18px; }
+    .prob-number { font-size: 3.5rem; font-weight: 900; line-height: 1; }
+    .prob-number.low      { color: var(--green); }
+    .prob-number.moderate { color: var(--amber); }
+    .prob-number.high     { color: #f97316; }
+    .prob-number.very-high { color: var(--red); }
+    .prob-bar-wrap { flex: 1; }
+    .prob-bar-track { height: 10px; background: var(--surface); border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
+    .prob-bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+    .prob-bar-fill.low       { background: var(--green); }
+    .prob-bar-fill.moderate  { background: var(--amber); }
+    .prob-bar-fill.high      { background: #f97316; }
+    .prob-bar-fill.very-high { background: var(--red); }
+    .prob-label { font-size: 0.75rem; color: var(--muted); }
+
+    .risk-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 8px; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 14px; }
+    .risk-badge.low       { background: rgba(34,197,94,0.12);  border: 1px solid rgba(34,197,94,0.3);  color: #86efac; }
+    .risk-badge.moderate  { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+    .risk-badge.high      { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.3); color: #fdba74; }
+    .risk-badge.very-high { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+    .risk-action { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+    .risk-action strong { color: var(--text); }
+
+    .diff-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(51,65,85,0.5); }
+    .diff-row:last-child { border-bottom: none; }
+    .diff-name { flex: 1; font-size: 0.85rem; color: var(--text); }
+    .diff-bar-wrap { width: 120px; }
+    .diff-bar-track { height: 5px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+    .diff-bar-fill { height: 100%; border-radius: 3px; }
+    .diff-pct { width: 40px; text-align: right; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .checklist { display: flex; flex-direction: column; gap: 10px; }
+    .check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.875rem; color: var(--text); line-height: 1.4; }
+    .check-icon { color: var(--teal); font-size: 1rem; margin-top: 1px; flex-shrink: 0; }
+
+    .ncdc-box { background: rgba(45,212,191,0.06); border: 1px solid rgba(45,212,191,0.2); border-radius: 10px; padding: 18px 20px; }
+    .ncdc-box__title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); margin-bottom: 12px; }
+    .ncdc-contact { display: flex; flex-direction: column; gap: 7px; }
+    .ncdc-contact-row { display: flex; align-items: center; gap: 10px; font-size: 0.875rem; color: var(--text); }
+    .ncdc-contact-row .label { color: var(--muted); min-width: 60px; font-size: 0.8rem; }
+    .ncdc-contact-row a { color: var(--teal); text-decoration: none; }
+    .ncdc-contact-row a:hover { text-decoration: underline; }
+
+    .disclaimer { margin-top: 32px; padding: 16px 20px; background: rgba(15,23,42,0.8); border: 1px solid var(--border); border-radius: 8px; font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
+    .disclaimer strong { color: var(--text); }
+
+    .btn-reset { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 0.825rem; padding: 8px 18px; border-radius: 7px; cursor: pointer; transition: border-color 0.15s, color 0.15s; margin-top: 8px; }
+    .btn-reset:hover { border-color: var(--text); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<div id="site-nav"></div>
+
+<div class="page-wrap">
+
+  <div class="hero">
+    <div class="hero-badge">🏥 Clinical Decision Support · Nigeria</div>
+    <h1>Lassa Fever <span>Clinical Copilot</span></h1>
+    <p class="hero-sub">Symptom-based probability scoring for healthcare workers. Not a diagnostic device — for clinical decision support only.</p>
+  </div>
+
+  <div class="warning-box" role="alert">
+    <div class="warning-box__title">⚠ Important safety information — read before use</div>
+    <p>This tool does <strong>not diagnose Lassa fever</strong>. It provides <strong>probability estimates</strong> to support clinical decision-making. All results require laboratory RT-PCR confirmation. Probability estimates are based on published clinical literature and must not replace clinical judgment.</p>
+    <p>Report any suspected case to NCDC immediately — do not wait for laboratory results before notifying.</p>
+    <a class="ncdc-hotline" href="tel:08009700010">📞 NCDC Hotline: 0800-970000-10 (toll-free, 24/7)</a>
+  </div>
+
+  <!-- Section 1: Patient context -->
+  <div class="form-card">
+    <div class="form-card__title">Section 1 — Patient context</div>
+    <div class="form-row">
+      <label for="state-select">State of residence</label>
+      <select id="state-select">
+        <option value="">— Select state —</option>
+        <option value="Abia">Abia</option>
+        <option value="Adamawa">Adamawa</option>
+        <option value="Akwa Ibom">Akwa Ibom</option>
+        <option value="Anambra">Anambra</option>
+        <option value="Bauchi">Bauchi ⚠ High-burden</option>
+        <option value="Bayelsa">Bayelsa</option>
+        <option value="Benue">Benue</option>
+        <option value="Borno">Borno</option>
+        <option value="Cross River">Cross River</option>
+        <option value="Delta">Delta</option>
+        <option value="Ebonyi">Ebonyi ⚠ High-burden</option>
+        <option value="Edo">Edo ⚠ High-burden</option>
+        <option value="Ekiti">Ekiti</option>
+        <option value="Enugu">Enugu</option>
+        <option value="FCT">FCT (Abuja)</option>
+        <option value="Gombe">Gombe</option>
+        <option value="Imo">Imo</option>
+        <option value="Jigawa">Jigawa</option>
+        <option value="Kaduna">Kaduna</option>
+        <option value="Kano">Kano</option>
+        <option value="Katsina">Katsina</option>
+        <option value="Kebbi">Kebbi</option>
+        <option value="Kogi">Kogi</option>
+        <option value="Kwara">Kwara</option>
+        <option value="Lagos">Lagos</option>
+        <option value="Nasarawa">Nasarawa</option>
+        <option value="Niger">Niger</option>
+        <option value="Ogun">Ogun</option>
+        <option value="Ondo">Ondo ⚠ High-burden</option>
+        <option value="Osun">Osun</option>
+        <option value="Oyo">Oyo</option>
+        <option value="Plateau">Plateau</option>
+        <option value="Rivers">Rivers</option>
+        <option value="Sokoto">Sokoto</option>
+        <option value="Taraba">Taraba ⚠ High-burden</option>
+        <option value="Yobe">Yobe</option>
+        <option value="Zamfara">Zamfara</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Is the patient a healthcare worker?</label>
+      <div class="radio-row">
+        <label class="radio-item" id="hcw-yes-wrap">
+          <input type="radio" name="hcw" id="hcw-yes" value="yes"> Yes
+        </label>
+        <label class="radio-item" id="hcw-no-wrap">
+          <input type="radio" name="hcw" id="hcw-no" value="no" checked> No
+        </label>
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="days-onset">Days since symptom onset</label>
+      <input type="number" id="days-onset" min="1" max="30" placeholder="e.g. 4" style="max-width:180px;">
+    </div>
+  </div>
+
+  <!-- Section 2: Major symptoms -->
+  <div class="form-card">
+    <div class="form-card__title">Section 2 — Major symptoms <span style="font-weight:400;color:var(--muted);font-size:0.65rem;text-transform:none;letter-spacing:0;">(higher specificity for Lassa fever)</span></div>
+    <div class="cb-grid">
+      <label class="cb-item"><input type="checkbox" id="cb-fever"><span class="cb-label">Fever above 38.5°C</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-sore-throat"><span class="cb-label">Sore throat or pharyngitis</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-chest-pain"><span class="cb-label">Retrosternal chest pain</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-bleeding"><span class="cb-label">Mucosal bleeding</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-swelling"><span class="cb-label">Facial swelling or edema</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-hearing"><span class="cb-label">Hearing loss or changes</span></label>
+    </div>
+  </div>
+
+  <!-- Section 3: Other symptoms -->
+  <div class="form-card">
+    <div class="form-card__title">Section 3 — Other symptoms</div>
+    <div class="cb-grid">
+      <label class="cb-item"><input type="checkbox" id="cb-headache"><span class="cb-label">Headache</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-myalgia"><span class="cb-label">Muscle or joint pain</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-vomiting"><span class="cb-label">Vomiting</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-diarrhea"><span class="cb-label">Diarrhea</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-abdo"><span class="cb-label">Abdominal pain</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-weakness"><span class="cb-label">Weakness or fatigue</span></label>
+    </div>
+  </div>
+
+  <!-- Section 4: Exposure history -->
+  <div class="form-card">
+    <div class="form-card__title">Section 4 — Exposure history <span style="font-weight:400;color:var(--muted);font-size:0.65rem;text-transform:none;letter-spacing:0;">(last 21 days)</span></div>
+    <div class="cb-grid">
+      <label class="cb-item"><input type="checkbox" id="cb-contact-confirmed"><span class="cb-label">Contact with confirmed Lassa case</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-rodent"><span class="cb-label">Contact with rodents or droppings</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-high-risk-area"><span class="cb-label">Lives in or visited high-risk area (Edo, Ondo, Bauchi, Taraba, Ebonyi)</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-family-ill"><span class="cb-label">Family member with similar illness</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-hcw-noppe"><span class="cb-label">Worked with febrile patients without PPE</span></label>
+    </div>
+  </div>
+
+  <button class="btn-calculate" onclick="calculate()">Calculate Lassa probability →</button>
+
+  <!-- Results -->
+  <div id="results" aria-live="polite">
+
+    <div class="results-card" style="margin-top:28px;">
+      <div class="results-card__title">Probability estimate</div>
+      <div class="prob-score-wrap">
+        <div class="prob-number" id="prob-number">—</div>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar-track"><div class="prob-bar-fill" id="prob-bar" style="width:0%"></div></div>
+          <div class="prob-label" id="prob-label">—</div>
+        </div>
+      </div>
+      <p style="font-size:0.75rem;color:var(--muted);">Probability estimate based on symptom weights derived from published Lassa fever clinical literature (McCormick 1987, Okokhere et al. 2018, Brosh-Nissimov 2020). All results require laboratory RT-PCR confirmation. This is <strong style="color:var(--text);">not a diagnostic result</strong>.</p>
+    </div>
+
+    <div class="results-card">
+      <div class="results-card__title">Risk category and recommended action</div>
+      <div class="risk-badge" id="risk-badge">—</div>
+      <div class="risk-action" id="risk-action">—</div>
+    </div>
+
+    <div class="results-card">
+      <div class="results-card__title">Differential — conditions to consider</div>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Relative likelihoods in a febrile patient presenting in Nigeria. These are illustrative estimates to support the workup, not validated diagnostic probabilities. Lassa fever co-infection with malaria is common and does not exclude either condition.</p>
+      <div id="diff-list"></div>
+    </div>
+
+    <div class="results-card">
+      <div class="results-card__title">Recommended clinical actions</div>
+      <div class="checklist">
+        <div class="check-item"><span class="check-icon">☐</span>Place patient in single-room isolation</div>
+        <div class="check-item"><span class="check-icon">☐</span>Use full PPE: gloves, gown, N95/FFP2 mask, eye protection</div>
+        <div class="check-item"><span class="check-icon">☐</span>Collect blood sample for Lassa RT-PCR (contact NCDC for nearest lab)</div>
+        <div class="check-item"><span class="check-icon">☐</span>Notify state epidemiologist now</div>
+        <div class="check-item"><span class="check-icon">☐</span>Report to NCDC: 0800-970000-10</div>
+        <div class="check-item"><span class="check-icon">☐</span>Document full exposure history and potential contact list</div>
+        <div class="check-item" id="action-ribavirin" style="display:none;"><span class="check-icon" style="color:#f97316;">☐</span><span>If RT-PCR will be delayed more than 24 hours and clinical suspicion remains very high: consider empirical ribavirin after discussion with senior clinician and NCDC — do not administer without senior clinical oversight.</span></div>
+      </div>
+    </div>
+
+    <div class="ncdc-box">
+      <div class="ncdc-box__title">📡 Report this case to NCDC</div>
+      <div class="ncdc-contact">
+        <div class="ncdc-contact-row"><span class="label">Phone</span><a href="tel:08009700010"><strong>0800-970000-10</strong></a> <span style="font-size:0.75rem;color:var(--muted);">(toll-free, 24 hours, 7 days)</span></div>
+        <div class="ncdc-contact-row"><span class="label">Online</span><a href="https://ncdc.gov.ng/report" target="_blank" rel="noopener">ncdc.gov.ng/report</a></div>
+        <div class="ncdc-contact-row"><span class="label">Email</span><a href="mailto:info@ncdc.gov.ng">info@ncdc.gov.ng</a></div>
+      </div>
+    </div>
+
+    <button class="btn-reset" onclick="resetForm()">← Start over</button>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Medical disclaimer.</strong> This tool provides probability estimates only and does not constitute a medical diagnosis, clinical advice, or a recommendation for treatment. Probability estimates are derived from published clinical scoring literature for Lassa fever and have not been prospectively validated in a clinical study. All clinical decisions must be made by qualified healthcare professionals. This tool is intended to support, not replace, clinical judgment. GaiaLab accepts no liability for clinical decisions made using this tool.
+    <br><br>
+    <strong>Data privacy.</strong> No symptom data entered in this form is transmitted to any server. All calculations run entirely in your browser. Nothing is stored or logged.
+    <br><br>
+    Developed by GaiaLab · Houston, TX, USA · <a href="mailto:partnerships@gailabai.com" style="color:var(--teal);">partnerships@gailabai.com</a> · <a href="/lassa" style="color:var(--teal);">LassaAI outbreak dashboard →</a>
+  </div>
+
+</div>
+
+<script>
+// Checkbox visual state
+document.querySelectorAll('.cb-item input[type="checkbox"]').forEach(function(cb) {
+  cb.addEventListener('change', function() {
+    var wrap = this.closest('.cb-item');
+    if (wrap) wrap.classList.toggle('checked', this.checked);
+  });
+});
+document.querySelectorAll('.radio-item input[type="radio"]').forEach(function(r) {
+  r.addEventListener('change', function() {
+    document.querySelectorAll('.radio-item').forEach(function(el) { el.classList.remove('selected'); });
+    var wrap = this.closest('.radio-item');
+    if (wrap) wrap.classList.add('selected');
+  });
+});
+
+var HIGH_RISK_STATES = ['Edo', 'Ondo', 'Bauchi', 'Taraba', 'Ebonyi'];
+
+function riskClass(score) {
+  if (score < 35) return 'low';
+  if (score < 60) return 'moderate';
+  if (score < 80) return 'high';
+  return 'very-high';
+}
+
+var RISK_ACTIONS = {
+  'low':       '<strong>LOW RISK.</strong> Standard fever workup is appropriate. Consider malaria RDT and blood cultures. Monitor closely for 48 hours and re-assess if symptoms progress. Lassa fever is possible but less likely based on current information.',
+  'moderate':  '<strong>MODERATE RISK.</strong> Lassa fever is a plausible probability based on this assessment. Place patient in single-room isolation while awaiting RT-PCR. Use standard contact and droplet precautions. Notify state epidemiologist. Consider Lassa RT-PCR.',
+  'high':      '<strong>HIGH RISK.</strong> Isolate immediately with full contact and airborne precautions. Collect blood for Lassa RT-PCR as a priority. Notify state epidemiologist now. Do not wait for laboratory results before implementing full precautions and NCDC notification.',
+  'very-high': '<strong>VERY HIGH RISK.</strong> Full isolation with airborne precautions and complete PPE immediately. Emergency NCDC notification required — call 0800-970000-10 now. If laboratory testing will be delayed more than 24 hours, consider empirical ribavirin only after discussion with NCDC and senior clinical oversight.'
+};
+
+function calculate() {
+  var state = document.getElementById('state-select').value;
+  var isHCW = document.querySelector('input[name="hcw"]:checked') && document.querySelector('input[name="hcw"]:checked').value === 'yes';
+
+  var fever    = document.getElementById('cb-fever').checked;
+  var soreThroat = document.getElementById('cb-sore-throat').checked;
+  var chestPain  = document.getElementById('cb-chest-pain').checked;
+  var bleeding   = document.getElementById('cb-bleeding').checked;
+  var swelling   = document.getElementById('cb-swelling').checked;
+  var hearing    = document.getElementById('cb-hearing').checked;
+
+  var headache = document.getElementById('cb-headache').checked;
+  var myalgia  = document.getElementById('cb-myalgia').checked;
+  var vomiting = document.getElementById('cb-vomiting').checked;
+  var diarrhea = document.getElementById('cb-diarrhea').checked;
+  var abdo     = document.getElementById('cb-abdo').checked;
+  var weakness = document.getElementById('cb-weakness').checked;
+
+  var contactConfirmed = document.getElementById('cb-contact-confirmed').checked;
+  var rodent           = document.getElementById('cb-rodent').checked;
+  var highRiskArea     = document.getElementById('cb-high-risk-area').checked;
+  var familyIll        = document.getElementById('cb-family-ill').checked;
+  var hcwNoPpe         = document.getElementById('cb-hcw-noppe').checked;
+
+  var score = 15; // background prevalence base in high-risk season, Nigeria
+
+  if (fever)      score += 15;
+  if (soreThroat) score += 12;
+  if (chestPain)  score += 18;
+  if (bleeding)   score += 20;
+  if (swelling)   score += 15;
+  if (hearing)    score += 22;
+
+  if (headache) score += 5;
+  if (myalgia)  score += 5;
+  if (vomiting) score += 7;
+  if (diarrhea) score += 5;
+  if (abdo)     score += 6;
+  if (weakness) score += 4;
+
+  if (contactConfirmed)   score += 30;
+  if (rodent)             score += 15;
+  if (highRiskArea)       score += 12;
+  if (familyIll)          score += 18;
+  if (isHCW && hcwNoPpe) score += 20;
+
+  if (state && HIGH_RISK_STATES.indexOf(state) !== -1) score = score * 1.25;
+
+  var anyInput = fever||soreThroat||chestPain||bleeding||swelling||hearing||
+                 headache||myalgia||vomiting||diarrhea||abdo||weakness||
+                 contactConfirmed||rodent||highRiskArea||familyIll||hcwNoPpe;
+  if (!anyInput) score = 5;
+
+  score = Math.min(Math.round(score), 95);
+
+  var cls = riskClass(score);
+
+  // Probability display
+  var numEl = document.getElementById('prob-number');
+  numEl.textContent = score + '%';
+  numEl.className = 'prob-number ' + cls;
+
+  var bar = document.getElementById('prob-bar');
+  bar.style.width = score + '%';
+  bar.className = 'prob-bar-fill ' + cls;
+
+  var labelMap = { low: 'Low probability', moderate: 'Moderate probability', high: 'High probability', 'very-high': 'Very high probability' };
+  document.getElementById('prob-label').textContent = labelMap[cls] + ' — ' + score + '% estimated likelihood of Lassa fever';
+
+  // Risk badge + action
+  var badgeEl = document.getElementById('risk-badge');
+  badgeEl.textContent = cls === 'very-high' ? 'VERY HIGH RISK' : cls.toUpperCase() + ' RISK';
+  badgeEl.className = 'risk-badge ' + cls;
+  document.getElementById('risk-action').innerHTML = RISK_ACTIONS[cls];
+
+  // Differential
+  var malaria = Math.min(90, Math.max(5, Math.round(85 - score * 0.6)));
+  var typhoid = Math.min(60, Math.max(3, Math.round(40 - score * 0.3)));
+  var ovhf    = score > 40 ? Math.min(25, Math.round(score * 0.12)) : 3;
+  var sepsis  = Math.min(40, Math.max(2, Math.round(25 - score * 0.2)));
+  var diffs = [
+    { name: 'Lassa fever', pct: score, color: 'var(--lassa)' },
+    { name: 'Severe malaria', pct: malaria, color: 'var(--teal)' },
+    { name: 'Typhoid fever', pct: typhoid, color: 'var(--teal)' },
+    { name: 'Other viral haemorrhagic fever', pct: ovhf, color: 'var(--teal)' },
+    { name: 'Bacterial sepsis', pct: sepsis, color: 'var(--teal)' }
+  ];
+  var maxPct = Math.max.apply(null, diffs.map(function(d) { return d.pct; }));
+  document.getElementById('diff-list').innerHTML = diffs.map(function(d) {
+    var barW = Math.round((d.pct / maxPct) * 100);
+    return '<div class="diff-row">' +
+      '<div class="diff-name">' + d.name + '</div>' +
+      '<div class="diff-bar-wrap"><div class="diff-bar-track"><div class="diff-bar-fill" style="width:' + barW + '%;background:' + d.color + '"></div></div></div>' +
+      '<div class="diff-pct">' + d.pct + '%</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('action-ribavirin').style.display = (cls === 'very-high') ? '' : 'none';
+
+  document.getElementById('results').style.display = '';
+  setTimeout(function() {
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+}
+
+function resetForm() {
+  document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    cb.checked = false;
+    var wrap = cb.closest('.cb-item');
+    if (wrap) wrap.classList.remove('checked');
+  });
+  document.getElementById('hcw-no').checked = true;
+  document.querySelectorAll('.radio-item').forEach(function(el) { el.classList.remove('selected'); });
+  document.getElementById('state-select').value = '';
+  document.getElementById('days-onset').value = '';
+  document.getElementById('results').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

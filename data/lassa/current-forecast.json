@@ -1,0 +1,346 @@
+{
+  "generated_at": "2026-05-30",
+  "forecast_horizon_weeks": 4,
+  "model": "outbreak-model-v1",
+  "forecasts": [
+    {
+      "state": "Edo",
+      "probability": 0.003,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Ondo",
+      "probability": 0.001,
+      "risk": "LOW",
+      "change_vs_last_week": 0.001,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Abia",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Adamawa",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Akwa Ibom",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Anambra",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Bauchi",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Bayelsa",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Benue",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Borno",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Cross River",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Delta",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Ebonyi",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Ekiti",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Enugu",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "FCT",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Gombe",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Imo",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Jigawa",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Kaduna",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Kano",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Katsina",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Kebbi",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Kogi",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Kwara",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Lagos",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Nasarawa",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Niger",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Ogun",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Osun",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Oyo",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Plateau",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Rivers",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Sokoto",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.001,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Taraba",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Yobe",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": 0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    },
+    {
+      "state": "Zamfara",
+      "probability": 0.0,
+      "risk": "LOW",
+      "change_vs_last_week": -0.0,
+      "as_of_year": 2026,
+      "as_of_week": 22
+    }
+  ],
+  "summary": {
+    "high_risk_states": [],
+    "medium_risk_states": [],
+    "low_risk_states": [
+      "Edo",
+      "Ondo",
+      "Abia",
+      "Adamawa",
+      "Akwa Ibom",
+      "Anambra",
+      "Bauchi",
+      "Bayelsa",
+      "Benue",
+      "Borno",
+      "Cross River",
+      "Delta",
+      "Ebonyi",
+      "Ekiti",
+      "Enugu",
+      "FCT",
+      "Gombe",
+      "Imo",
+      "Jigawa",
+      "Kaduna",
+      "Kano",
+      "Katsina",
+      "Kebbi",
+      "Kogi",
+      "Kwara",
+      "Lagos",
+      "Nasarawa",
+      "Niger",
+      "Ogun",
+      "Osun",
+      "Oyo",
+      "Plateau",
+      "Rivers",
+      "Sokoto",
+      "Taraba",
+      "Yobe",
+      "Zamfara"
+    ]
+  }
+}
