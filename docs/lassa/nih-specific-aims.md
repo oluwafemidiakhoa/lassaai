@@ -1,7 +1,8 @@
 # NIH Specific Aims — LassaAI Prospective Validation Study
 **Fogarty International Center — PAR-23-268 (R21)**  
 *LOI deadline: September 16, 2026 · Application deadline: October 16, 2026*  
-*Format: 1 page · Font: Arial 11pt · Margins: 0.5 in*
+*Format: 1 page · Font: Arial 11pt · Margins: 0.5 in*  
+*Status: Draft v0.2 — 2026-05-30 · GitHub repo live ✓ · NCDC outreach email ready ✓*
 
 ---
 
@@ -9,7 +10,7 @@
 
 Lassa fever kills an estimated 5,000–10,000 people annually in West Africa, with Nigeria bearing the highest documented burden. Despite weekly epidemiological surveillance by the Nigeria Centre for Disease Control and Prevention (NCDC), no validated early warning system exists. Reactive public health response — deploying ribavirin stockpiles, activating healthcare worker protocols, and alerting state epidemiologists only after confirmed cases accumulate — delays intervention at the most critical window.
 
-We developed **LassaAI**, an XGBoost outbreak prediction model trained on 15 years of NCDC surveillance data (27,417 state-week observations, 37 administrative units). In retrospective temporal validation on a 2024–2025 holdout, LassaAI achieved AUROC = 0.9994 with perfect recall (zero missed outbreaks) and precision = 0.910, predicting outbreak risk 4–8 weeks in advance. The model is deployed as a free, open-source real-time dashboard (https://www.gailabai.com/lassa). All retrospective performance metrics, however, were computed on historical data. **The critical unresolved question is whether LassaAI's predictions — issued before outcomes are known — are accurate enough to guide public health action in prospective use.**
+We developed **LassaAI**, an XGBoost outbreak prediction model trained on 15 years of NCDC surveillance data (27,417 state-week observations, 37 administrative units). In retrospective temporal validation on a 2024–2025 holdout, LassaAI achieved AUROC = 0.9994 with perfect recall (zero missed outbreaks) and precision = 0.910, predicting outbreak risk 4–8 weeks in advance. The model is deployed as a free, open-source real-time dashboard (https://www.gailabai.com/lassa) with all code, data, and model weights publicly available (https://github.com/oluwafemidiakhoa/lassaai, MIT licence, live May 2026). All retrospective performance metrics, however, were computed on historical data. **The critical unresolved question is whether LassaAI's predictions — issued before outcomes are known — are accurate enough to guide public health action in prospective use.**
 
 To address this gap, we propose a prospective validation and capacity-building study in partnership with NCDC. Our **central hypothesis** is that LassaAI will achieve AUROC ≥ 0.92 and Brier score ≤ 0.08 across a full prospective epidemiological year (52 prediction weeks including one complete dry season), with performance non-inferior to NCDC reactive surveillance as measured by mean alert lead time.
 

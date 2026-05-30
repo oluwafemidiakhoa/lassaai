@@ -6,7 +6,7 @@
 **Project period:** 24 months  
 **Letter of Intent deadline:** September 16, 2026  
 **Application deadline:** October 16, 2026  
-**Status:** Draft v0.1 — 2026-05-30
+**Status:** Draft v0.2 — 2026-05-30 · GitHub repo live ✓
 
 ---
 
@@ -190,7 +190,7 @@ I am the founder of GaiaLab, an AI-powered biological intelligence platform base
 
 My work combines deep technical expertise in machine learning and software engineering with a commitment to applying these tools to the neglected tropical diseases that disproportionately affect sub-Saharan Africa. I have independently assembled the largest known longitudinal dataset linking NCDC Lassa fever surveillance data with ERA5 climate reanalysis, covering 15 years and all 37 Nigerian states. This project is a direct extension of that work into prospective validation and clinical translation.
 
-I am committed to open science: all LassaAI code, data, and models are MIT-licensed and publicly available at https://github.com/oluwafemidiakhoa/lassaai. The live forecasting dashboard and Clinical Copilot are freely accessible to NCDC staff, healthcare workers, and researchers at https://www.gailabai.com/lassa.
+I am committed to open science: all LassaAI code, data, and models are MIT-licensed and publicly available at https://github.com/oluwafemidiakhoa/lassaai (27 files, 27,861-observation dataset, trained XGBoost model, and Clinical Copilot — public since May 2026). The live forecasting dashboard and Clinical Copilot are freely accessible to NCDC staff, healthcare workers, and researchers at https://www.gailabai.com/lassa.
 
 **B. Positions, Scientific Appointments, and Honors**
 
@@ -212,7 +212,7 @@ I assembled and curated the first longitudinal dataset linking NCDC weekly Lassa
 I designed a Bayesian logistic regression clinical decision support tool for healthcare workers, using log-odds weights derived from peer-reviewed Lassa fever clinical literature (Bausch et al. 2001; Ficenec et al. 2020; Okokhere et al. 2018; WHO 2017). The copilot handles 23 clinical and epidemiological features and is calibrated to 7/7 published clinical scenarios. It is freely accessible at https://www.gailabai.com/lassa-copilot and includes NCDC emergency reporting contacts.
 
 **3. GaiaLab Evidence Operating System**
-I built and maintain GaiaLab, an AI-powered biological intelligence platform that integrates data from 54 biomedical databases, applies multi-agent AI reasoning, and generates publication-ready biological insights from gene panels. The platform supports clinical and translational research teams across oncology, rare diseases, and infectious diseases.
+I built and maintain GaiaLab, an AI-powered biological intelligence platform that integrates data from 75 biomedical databases, applies multi-agent AI reasoning, and generates publication-ready biological insights from gene panels. The platform supports clinical and translational research teams across oncology, rare diseases, and infectious diseases.
 
 **D. Additional Information: Research Support**
 

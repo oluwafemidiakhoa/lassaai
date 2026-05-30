@@ -22,7 +22,8 @@ On a prospective holdout covering 2024 and 2025, the model achieved:
 
 We have also developed a Clinical Copilot — a Bayesian probability calculator for healthcare workers at the point of care, which estimates the likelihood of Lassa fever in a febrile patient based on clinical symptoms and epidemiological exposures. Both tools are freely available, open-source, and designed to operate in low-resource settings without proprietary software.
 
-A live demonstration is available at: https://www.gailabai.com/lassa
+A live demonstration is available at: https://www.gailabai.com/lassa  
+All code, training data, and model weights are publicly available at: https://github.com/oluwafemidiakhoa/lassaai
 
 **Why we are reaching out to NCDC**
 
@@ -58,7 +59,7 @@ LassaAI: https://www.gailabai.com/lassa
 
 ---
 
-## Verified Contact Notes (checked May 2026)
+## Verified Contact Notes (checked May 30, 2026)
 
 - **Dr. Jide Idris** is the current NCDC Director-General as of 2026. Verify at ncdc.gov.ng before sending.
 - Primary email: director@ncdc.gov.ng — also try dg@ncdc.gov.ng if no reply within 10 days.

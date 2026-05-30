@@ -2,9 +2,9 @@
 
 **Journal target:** PLOS Neglected Tropical Diseases  
 **Manuscript type:** Research Article  
-**Status:** Draft v0.1 — 2026-05-29  
+**Status:** Draft v0.2 — 2026-05-30  
 **Abstract word count:** 292 / 300 (PLOS NTD limit) ✓  
-**Submission checklist:** Structured abstract ✓ · Ethics statement ✓ · Data availability statement ✓ · Cover letter (needed) · References formatted (needed)
+**Submission checklist:** Structured abstract ✓ · Ethics statement ✓ · Data availability statement ✓ · Cover letter (see docs/lassa/cover-letter-plos-ntd.md) ✓ · References formatted (needed) · GitHub repo live ✓ (https://github.com/oluwafemidiakhoa/lassaai)
 
 ---
 
@@ -233,7 +233,7 @@ We present LassaAI, the first temporally validated machine learning system for s
 
 Critically, no lives are yet saved by a retrospectively validated model. The clinical and public health value of LassaAI will be established through prospective validation — whether weekly predictions issued before outcomes are known prove accurate across a full epidemiological year including a high-burden dry season. We have built and deployed the infrastructure to conduct this validation openly and in real time. We invite NCDC, MSF, Irrua Specialist Teaching Hospital, and the broader Lassa fever research community to engage with this work.
 
-All code, model weights, forecast data, and prospective validation logs are released under an MIT licence at https://github.com/oluwafemidiakhoa/lassaai. The live dashboard is freely accessible at https://www.gailabai.com/lassa. We hope this work catalyses the development of a Nigerian national Lassa fever early warning system that can meaningfully reduce the 5,000–10,000 deaths that occur annually across West Africa from this neglected but preventable disease.
+All code, model weights, forecast data, and prospective validation logs are released under an MIT licence at https://github.com/oluwafemidiakhoa/lassaai (public, live as of May 2026). The live dashboard is freely accessible at https://www.gailabai.com/lassa. We hope this work catalyses the development of a Nigerian national Lassa fever early warning system that can meaningfully reduce the 5,000–10,000 deaths that occur annually across West Africa from this neglected but preventable disease.
 
 ---
 
