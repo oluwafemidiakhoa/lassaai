@@ -121,6 +121,12 @@ We trained an XGBoost gradient-boosted decision tree classifier (Chen & Guestrin
 
 No data from the validation or test periods was used in feature computation or model selection. This strict temporal split prevents the data leakage that would occur with random cross-validation on time series data.
 
+### Class Imbalance
+
+The outcome class imbalance (6.1% outbreak weeks, 93.9% non-outbreak weeks; ratio 1:15.3) reflects the known geographic and seasonal concentration of Lassa fever transmission in Nigeria. Five states — Edo, Ondo, Bauchi, Taraba, and Ebonyi — account for 83% of all confirmed cases in our dataset, and transmission in these states is concentrated in the dry season (November–April). Twenty-two of 37 states reported zero confirmed cases across the entire study period. This imbalance is therefore ecologically correct rather than a sampling artifact: a model that predicted "no outbreak" for every state-week would achieve 93.9% accuracy but near-zero clinical utility.
+
+We addressed class imbalance in two ways. First, we set the XGBoost `scale_pos_weight` hyperparameter to 15.3 (the negative-to-positive ratio), which up-weights the minority class during gradient computation and discourages the classifier from converging to a majority-class default. Second, we selected AUROC as the primary evaluation metric rather than accuracy. AUROC measures discrimination across all probability thresholds and is unaffected by class imbalance; a model with no discriminative ability achieves AUROC = 0.50 regardless of class distribution. Precision, recall, and F1-score at the default threshold (0.5) are reported as secondary metrics. Given the public health context — where a missed outbreak week carries far greater cost than a false alarm — recall (sensitivity) was pre-specified as the secondary metric of greatest clinical relevance.
+
 ### Model Evaluation
 
 We evaluated the model on the held-out test set using:
