@@ -225,6 +225,7 @@
     <div class="form-card__title">Section 2 — Major symptoms <span style="font-weight:400;color:var(--muted);font-size:0.65rem;text-transform:none;letter-spacing:0;">(higher specificity for Lassa fever)</span></div>
     <div class="cb-grid">
       <label class="cb-item"><input type="checkbox" id="cb-fever"><span class="cb-label">Fever above 38.5°C</span></label>
+      <label class="cb-item"><input type="checkbox" id="cb-refractory-fever"><span class="cb-label">Fever unresponsive to antimalarials/antibiotics</span></label>
       <label class="cb-item"><input type="checkbox" id="cb-sore-throat"><span class="cb-label">Sore throat or pharyngitis</span></label>
       <label class="cb-item"><input type="checkbox" id="cb-chest-pain"><span class="cb-label">Retrosternal chest pain</span></label>
       <label class="cb-item"><input type="checkbox" id="cb-bleeding"><span class="cb-label">Mucosal bleeding</span></label>
@@ -359,6 +360,7 @@ function calculate() {
   var isHCW = document.querySelector('input[name="hcw"]:checked') && document.querySelector('input[name="hcw"]:checked').value === 'yes';
 
   var fever    = document.getElementById('cb-fever').checked;
+  var refractoryFever = document.getElementById('cb-refractory-fever').checked;
   var soreThroat = document.getElementById('cb-sore-throat').checked;
   var chestPain  = document.getElementById('cb-chest-pain').checked;
   var bleeding   = document.getElementById('cb-bleeding').checked;
@@ -381,6 +383,7 @@ function calculate() {
   var score = 15; // background prevalence base in high-risk season, Nigeria
 
   if (fever)      score += 15;
+  if (refractoryFever) score += 20; // febrile illness not responding to antimalarials/antibiotics — a strong early Lassa triage flag (frontline clinical input, ISTH Irrua)
   if (soreThroat) score += 12;
   if (chestPain)  score += 18;
   if (bleeding)   score += 20;
@@ -402,7 +405,7 @@ function calculate() {
 
   if (state && HIGH_RISK_STATES.indexOf(state) !== -1) score = score * 1.25;
 
-  var anyInput = fever||soreThroat||chestPain||bleeding||swelling||hearing||
+  var anyInput = fever||refractoryFever||soreThroat||chestPain||bleeding||swelling||hearing||
                  headache||myalgia||vomiting||diarrhea||abdo||weakness||
                  contactConfirmed||rodent||highRiskArea||familyIll||hcwNoPpe;
   if (!anyInput) score = 5;
