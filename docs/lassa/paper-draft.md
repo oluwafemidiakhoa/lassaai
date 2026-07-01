@@ -82,15 +82,11 @@ On the 2024 out-of-time hold-out:
 
 **Table 1. Performance on the 2024 hold-out (real national data), model versus naive baselines.**
 
-  ---------------------------------------------------------------------
-  Model                                         AUROC   Precision  Recall
-  --------------------------------------------- ------- ---------- ------
-  XGBoost (9 features)                          0.880   0.93       0.78
-
-  Naive baseline: recent 4-week case average    0.849   ---        ---
-
-  Naive baseline: previous-week case count      0.848   ---        ---
-  ---------------------------------------------------------------------
+| Model | AUROC | Precision | Recall |
+|:------|:-----:|:---------:|:------:|
+| XGBoost (9 features) | **0.880** | 0.93 | 0.78 |
+| Naive baseline: recent 4-week case average | 0.849 | — | — |
+| Naive baseline: previous-week case count | 0.848 | — | — |
 
 The model (AUROC 0.880; F1 0.85) improved on the best naive baseline (0.849) by ~0.03 AUROC. This is a **modest but genuine** gain — unlike a near-tautological weekly-incidence target, where models and baselines are indistinguishable. We explicitly do not interpret 0.88 as strong forecasting skill; much of the discrimination is attributable to seasonality and recent incidence, which the baselines also capture.
 
