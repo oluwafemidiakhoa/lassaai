@@ -283,24 +283,32 @@
     <div class="label">Nigerian states tracked</div>
   </div>
   <div class="stat-card">
-    <div class="value" id="stat-epiweeks">753</div>
-    <div class="label">Epi-weeks of training data</div>
+    <div class="value" id="stat-epiweeks">313</div>
+    <div class="label">Weeks of real NCDC data (2020–25)</div>
   </div>
   <div class="stat-card">
     <div class="value" id="stat-high">—</div>
-    <div class="label">High-risk states this week</div>
+    <div class="label">High-risk states (illustrative)</div>
   </div>
   <div class="stat-card">
-    <div class="value">2012</div>
-    <div class="label">Training data from</div>
+    <div class="value">2020</div>
+    <div class="label">Real data from</div>
   </div>
 </div>
 
 <!-- ── Outbreak Forecast ── -->
 <div class="section" id="forecast">
   <div class="section-header">
-    <div class="section-title">Outbreak Forecast — Next 4 Weeks</div>
+    <div class="section-title">Per-State Outbreak Forecast — Illustrative Prototype</div>
     <span class="section-badge" id="forecast-date">Loading...</span>
+  </div>
+
+  <div style="background:#3a1f1f;border:1px solid #dc2626;border-radius:8px;padding:12px 14px;margin:8px 0 14px;font-size:0.84rem;color:#fecaca;">
+    <strong>⚠ Not validated at state level.</strong> Only the <em>national</em> model is validated
+    (AUROC 0.88 vs 0.85 naive on real 2024 data — see Model card below). Real per-state weekly counts
+    are not yet available (NCDC publishes them as image tables), so the per-state probabilities shown
+    here are an <strong>illustrative prototype</strong>, not a validated forecast. Do not use for
+    operational decisions. Real per-state modelling is future work.
   </div>
 
   <div class="season-notice" id="season-notice" style="display:none;">
@@ -437,8 +445,8 @@
 <footer>
   <p>
     LassaAI is part of <a href="/">GaiaLab</a> — AI-powered biological intelligence.
-    Epidemiological data: <a href="https://ncdc.gov.ng/diseases/sitreps" target="_blank" rel="noopener">NCDC Nigeria</a>.
-    Climate data: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo ERA5</a>.
+    Data: <a href="https://ncdc.gov.ng/diseases/sitreps" target="_blank" rel="noopener">NCDC Weekly Epidemiological Reports</a>
+    (cross-validated) and <a href="https://doi.org/10.5281/zenodo.7309567" target="_blank" rel="noopener">SORMAS 2018–2021</a>.
     Not for clinical use. Research tool only.
   </p>
 </footer>
@@ -465,16 +473,7 @@ async function loadForecast() {
     dateEl.textContent = genDate ? `Generated ${genDate}` : 'Live';
     highEl.textContent = forecasts.filter(f => f.risk === 'HIGH').length;
 
-    // Compute epi-weeks from training start (2012-W01) to current forecast week
-    if (forecasts.length) {
-      const sample = forecasts[0];
-      const curYear = sample.as_of_year || new Date().getFullYear();
-      const curWeek = sample.as_of_week || 1;
-      const TRAIN_START_YEAR = 2012;
-      const weeksPerYear = 52;
-      const totalWeeks = (curYear - TRAIN_START_YEAR) * weeksPerYear + curWeek;
-      document.getElementById('stat-epiweeks').textContent = totalWeeks.toLocaleString();
-    }
+    // stat-epiweeks is a static real count (313 weeks of NCDC data, 2020-25); not derived here.
 
     // Show seasonal notice if in wet season (May–Oct)
     const month = new Date().getMonth() + 1;
