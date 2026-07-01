@@ -592,13 +592,14 @@ concerned.]
 ![](figures/figure1_geographic_distribution.png)
 
 **Figure 1. Geographic distribution of confirmed Lassa fever cases in
-Nigeria, 2011--2026.** Choropleth map of Nigeria showing cumulative
-confirmed Lassa fever cases per state across the study period. States
-are shaded by total case count in quintiles (white = lowest, dark red =
-highest). The five highest-burden states --- Edo (2,574 cases), Ondo
-(1,638), Bauchi (1,040), Taraba (884), and Ebonyi (728) --- are
-labelled. FCT = Federal Capital Territory. Data source: NCDC Weekly
-Lassa Fever Situation Reports 2011--2026.
+Nigeria, 2011--2026.** Horizontal bar chart of cumulative confirmed
+Lassa fever cases per state across the study period, ranked by burden
+and coloured by tier (red, >1,000 cases; orange, 400--1,000; teal, <400).
+The five highest-burden states --- Edo (2,574 cases), Ondo (1,638),
+Bauchi (1,040), Taraba (884), and Ebonyi (728) --- account for the large
+majority of the national total; 25 of the 37 administrative units
+reported zero confirmed cases. Data source: NCDC Weekly Lassa Fever
+Situation Reports 2011--2026.
 
 ![](figures/figure2_roc_curve.png)
 
@@ -627,8 +628,8 @@ temporal cross-validation.
 ![](figures/figure4_seasonal_heatmap.png)
 
 **Figure 4. Seasonal variation in Lassa fever case counts in Nigeria,
-2012--2026.** Weekly confirmed case counts aggregated across all 37
-states, 2012--2026, plotted as a heatmap with calendar week on the
+2012--2025.** Weekly confirmed case counts aggregated across all 37
+states, 2012--2025, plotted as a heatmap with calendar week on the
 x-axis and year on the y-axis. Colour intensity represents total weekly
 confirmed cases (white = 0, dark orange = highest). The dry season
 (November--April, indicated by grey shading) consistently corresponds to
