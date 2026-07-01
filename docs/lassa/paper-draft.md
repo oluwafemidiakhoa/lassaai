@@ -28,7 +28,7 @@ pre-positioning of resources and earlier clinical intervention.
 covering all 37 Nigerian administrative units (36 states plus FCT),
 merging NCDC weekly epidemiological sitrep data (8,138 confirmed cases;
 910 deaths) with gridded meteorological reanalysis data from Open-Meteo
-(ERA5). We engineered 18 predictive features including lagged case
+(ERA5). We engineered 19 predictive features including lagged case
 counts, rolling epidemic means, dry-season timing variables, and lagged
 weather covariates. An XGBoost gradient-boosted classifier was trained
 with strict temporal cross-validation (train ≤2021, validation
@@ -66,7 +66,7 @@ and Nigeria. Nigeria reports the highest absolute burden globally.
 Between 2011 and 2026, the NCDC confirmed 8,138 cases and 910 deaths
 across all 37 administrative units in our dataset, with Edo (2,574
 cases), Ondo (1,638 cases), Bauchi (1,040 cases), Taraba (884 cases),
-and Ebonyi (728 cases) accounting for 83% of the national total \[6\].
+and Ebonyi (728 cases) accounting for 84% of the national total \[6\].
 
 Case fatality rates in hospital-confirmed cases range from 15--25%
 overall and exceed 60% in the third trimester of pregnancy \[4\].
@@ -139,7 +139,7 @@ Institutional review board approval was not required.
 
 ### Feature Engineering
 
-From the merged state-week dataset, we engineered 18 predictive
+From the merged state-week dataset, we engineered 19 predictive
 features:
 
 **Temporal features (3):** - `month`: calendar month of the
@@ -163,8 +163,10 @@ confirmed cases - `cases_roll4_trend`: linear trend slope over rolling
 precipitation 4 and 8 weeks prior - `humidity_lag4`: relative humidity 4
 weeks prior - `temp_lag4`: maximum temperature 4 weeks prior
 
-**State indicator features (3):** - `is_edo`, `is_ondo`, `is_bauchi`:
-binary flags for the three highest-burden states
+**State indicator features (4):** - `is_edo`, `is_ondo`, `is_bauchi`:
+binary flags for the three highest-burden states - `is_high_risk`:
+binary flag for the ten highest-burden endemic states (Edo, Ondo,
+Bauchi, Taraba, Ebonyi, Anambra, Delta, Benue, Kogi, Nasarawa)
 
 Rows were retained only if at least 8 prior weeks of data were available
 (for lag-8 features) and at least 4 future weeks were available (to
@@ -220,9 +222,9 @@ series data.
 The outcome class imbalance (6.1% outbreak weeks, 93.9% non-outbreak
 weeks; ratio 1:15.3) reflects the known geographic and seasonal
 concentration of Lassa fever transmission in Nigeria. Five states ---
-Edo, Ondo, Bauchi, Taraba, and Ebonyi --- account for 83% of all
+Edo, Ondo, Bauchi, Taraba, and Ebonyi --- account for 84% of all
 confirmed cases in our dataset, and transmission in these states is
-concentrated in the dry season (November--April). Twenty-two of 37
+concentrated in the dry season (November--April). Twenty-five of 37
 states reported zero confirmed cases across the entire study period.
 This imbalance is therefore ecologically correct rather than a sampling
 artifact: a model that predicted "no outbreak" for every state-week
@@ -268,7 +270,7 @@ were retained for modelling.
 The dataset recorded 8,138 confirmed Lassa fever cases and 910 deaths
 across all 37 states. Edo State contributed the largest share (2,574
 confirmed cases; 468 deaths), followed by Ondo (1,638; 234), Bauchi
-(1,040; 130), Taraba (884; 52), and Ebonyi (728; 26). Twenty-two states
+(1,040; 130), Taraba (884; 52), and Ebonyi (728; 26). Twenty-five states
 reported zero confirmed cases over the study period, reflecting the
 focal geographic distribution of LASV transmission.
 
@@ -339,14 +341,15 @@ true positives. The optimal stopping point was iteration 330 (of 500).
   11                temp_lag4               0.5%              Max temperature 4
                                                               weeks prior
 
-  12--18            (weather/other)         1.3% combined     Dry season, rain,
-                                                              humidity, etc.
+  12--19            (weather/state/other)   1.5% combined     Dry-season flag,
+                                                              rain, humidity,
+                                                              is_high_risk (0.0%)
   -----------------------------------------------------------------------------
 
 Recent case history dominates the model signal: the top three features
 (8-week rolling mean, 1-week lag, 4-week rolling mean) together account
-for 89.3% of feature importance. Dry-season timing variables contribute
-3.5% combined. Weather variables (temperature, rainfall, humidity)
+for 89.2% of feature importance. Dry-season timing variables contribute
+3.7% combined. Weather variables (temperature, rainfall, humidity)
 account for 1.2% combined --- consistent with their role as distal
 determinants of rodent ecology rather than proximal transmission
 drivers.
@@ -586,6 +589,8 @@ concerned.]
 
 ## Figure Legends
 
+![](figures/figure1_geographic_distribution.png)
+
 **Figure 1. Geographic distribution of confirmed Lassa fever cases in
 Nigeria, 2011--2026.** Choropleth map of Nigeria showing cumulative
 confirmed Lassa fever cases per state across the study period. States
@@ -594,6 +599,8 @@ highest). The five highest-burden states --- Edo (2,574 cases), Ondo
 (1,638), Bauchi (1,040), Taraba (884), and Ebonyi (728) --- are
 labelled. FCT = Federal Capital Territory. Data source: NCDC Weekly
 Lassa Fever Situation Reports 2011--2026.
+
+![](figures/figure2_roc_curve.png)
 
 **Figure 2. Receiver operating characteristic (ROC) curve for the
 LassaAI outbreak prediction model.** ROC curve on the held-out
@@ -605,15 +612,19 @@ filled circle at sensitivity = 1.000, specificity = 0.900. AUROC =
 0.9994. Shaded region represents the 95% bootstrap confidence interval
 (1,000 bootstrap samples with replacement, stratified by year-state).
 
+![](figures/figure3_feature_importance.png)
+
 **Figure 3. XGBoost feature importance for the outbreak prediction
 model.** Horizontal bar chart showing the gain-based feature importance
-for the 18 input features. The dominant features are the 8-week rolling
+for the 19 input features. The dominant features are the 8-week rolling
 mean of confirmed cases (49.6%), the 1-week lagged case count (26.1%),
 and the 4-week rolling mean (13.6%). Dry-season timing variables (weeks
 into dry season, calendar month, dry-season binary flag) contribute 3.7%
 combined. Meteorological features (rainfall, temperature, humidity)
 contribute 1.2% combined. Error bars represent variance across 5-fold
 temporal cross-validation.
+
+![](figures/figure4_seasonal_heatmap.png)
 
 **Figure 4. Seasonal variation in Lassa fever case counts in Nigeria,
 2012--2026.** Weekly confirmed case counts aggregated across all 37
@@ -624,13 +635,17 @@ confirmed cases (white = 0, dark orange = highest). The dry season
 elevated case counts. Notable outbreaks visible in 2018 (declared
 national emergency by NCDC), 2020, 2022, and 2024.
 
-**Figure 5. LassaAI forecast dashboard --- current outbreak probability
-map.** Screenshot of the LassaAI real-time forecasting dashboard
-(https://www.gailabai.com/lassa) showing the current outbreak
-probability for each of the 37 Nigerian states. States are coloured by
-risk category: LOW (green), MEDIUM (amber), HIGH (red). The dashboard
-updates weekly as new NCDC sitrep data are incorporated. This figure
-illustrates the end-user interface deployed for public health use.
+![](figures/figure5_current_forecast.png)
+
+**Figure 5. LassaAI current outbreak-probability forecast, all 37
+Nigerian states (epidemiological week 22, 2026; 4-week horizon).**
+Horizontal bar chart of the model-estimated 4-week outbreak probability
+for each state. Dashed vertical lines mark the MODERATE (5%) and HIGH
+(20%) risk thresholds. As of epidemiological week 22 (wet season), all
+states fall in the LOW range, consistent with the expected seasonal
+minimum in transmission. Forecasts update weekly as new NCDC sitrep data
+are incorporated; the same model output drives the public dashboard at
+https://www.gailabai.com/lassa.
 
 ------------------------------------------------------------------------
 

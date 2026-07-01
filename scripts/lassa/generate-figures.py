@@ -119,7 +119,7 @@ ax.scatter([fpr[op_idx]], [tpr[op_idx]], s=90, zorder=5, color=RED,
            label=f"Operating point (Sensitivity=1.000, Specificity={1-fpr[op_idx]:.3f})")
 ax.set_xlabel("False Positive Rate  (1 − Specificity)", fontsize=12)
 ax.set_ylabel("True Positive Rate  (Sensitivity)", fontsize=12)
-ax.set_title("Figure 2  ROC curve — LassaAI outbreak prediction\nTest set: 2024–2025 prospective temporal holdout",
+ax.set_title("Figure 2  ROC curve — LassaAI outbreak prediction\nTest set: 2024–2025 out-of-time temporal holdout (retrospective)",
              fontsize=12, fontweight="bold", pad=14)
 ax.legend(loc="lower right", fontsize=10)
 ax.set_xlim(-0.01, 1.01)
