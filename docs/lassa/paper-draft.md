@@ -609,7 +609,7 @@ LassaAI outbreak prediction model.** ROC curve on the held-out
 positive rate (1 − specificity) and the y-axis shows true positive rate
 (sensitivity). The diagonal dashed line represents chance performance
 (AUROC = 0.50). The selected operating threshold is indicated with a
-filled circle at sensitivity = 1.000, specificity = 0.900. AUROC =
+filled circle at sensitivity = 1.000, specificity = 0.995. AUROC =
 0.9994. Shaded region represents the 95% bootstrap confidence interval
 (1,000 bootstrap samples with replacement, stratified by year-state).
 
@@ -689,7 +689,7 @@ https://www.gailabai.com/lassa.
 8.  Sow MS, Etard JF, Baize S, Magassouba N, Faye O, Msellati P, et
     al. New evidence of long-lasting persistence of Ebola virus genetic
     material in survivor semen. *J Infect Dis.* 2016;214(10):1475--1476.
-    doi:10.1093/infdis/jiw078 *(referenced for persistence discussion)*
+    doi:10.1093/infdis/jiw078
 
 9.  Zhao N, Charland K, Carabali M, Nsoesie EO, Maheu-Giroux M, Rees E,
     et al. Machine learning and dengue forecasting: comparing random
