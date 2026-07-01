@@ -21,7 +21,7 @@ Correspondence: partnerships@gailabai.com
 
 **Results:** On the 2024 hold-out, the model achieved AUROC = 0.880 (precision 0.93, recall 0.78, F1 0.85) for a non-degenerate target (56% of weeks positive). A naive baseline using only the recent 4-week case average achieved AUROC = 0.849, so the model improved on trivial persistence by a modest ~0.03 AUROC. The strongest predictor was dry-season timing (gain importance 53%), consistent with the well-established November–April Lassa season and with the SORMAS data (peak incidence in February).
 
-**Conclusions:** Real national surveillance data support a modest but genuine ability to anticipate elevated Lassa transmission weeks in Nigeria, driven chiefly by seasonality and recent incidence. We make no claim of exceptional forecasting skill: the model beats a naive baseline only slightly, and the true test is prospective. The contribution is an open, reproducible, honestly-benchmarked pipeline and a pre-registered prospective-validation protocol. All data are from public sources with full provenance.
+**Conclusions:** Real national surveillance data support a modest but genuine ability to anticipate elevated Lassa transmission weeks in Nigeria, driven chiefly by seasonality and recent incidence. We make no claim of exceptional forecasting skill: the model beats a naive baseline only slightly, and the true test is prospective. The contribution is an open, reproducible, honestly-benchmarked pipeline, with append-only forecast-logging infrastructure in place to enable prospective validation. All data are from public sources with full provenance.
 
 ------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ NCDC publishes weekly situation reports, yet response remains largely reactive. 
 1. We assembled and **cross-validated** a real national weekly Lassa incidence series for Nigeria (2020–2025) from NCDC Weekly Epidemiological Reports, checked against an independent extraction and NCDC's published annual totals.
 2. We defined a **non-degenerate** target — elevated (above-median) transmission over the next four weeks — rather than a trivially-always-true one.
 3. We trained and out-of-time-validated a model, and **benchmarked it against naive baselines**, showing a modest but genuine gain.
-4. We released the pipeline and a pre-registered prospective-validation protocol, and provide a SORMAS-based per-state/clinical cross-check.
+4. We released the pipeline with append-only forecast-logging infrastructure to enable prospective validation, and provide a SORMAS-based per-state/clinical cross-check.
 
 ------------------------------------------------------------------------
 
@@ -112,13 +112,13 @@ The pipeline is complemented by a Bayesian Lassa clinical-probability aid for po
 
 ### Why prospective validation is the real test
 
-Retrospective out-of-time discrimination overstates operational value for autocorrelated targets. The genuine test is prospective: predictions locked *before* outcomes are known, scored against a naive baseline over a full season. We have pre-registered such a protocol and built the append-only infrastructure to run it.
+Retrospective out-of-time discrimination overstates operational value for autocorrelated targets. The genuine test is prospective: predictions locked *before* outcomes are known, scored against a naive baseline over a full season. We have built append-only forecast-logging infrastructure to enable exactly this prospective evaluation.
 
 ------------------------------------------------------------------------
 
 ## Conclusion
 
-Using real, triple-cross-validated NCDC surveillance data, we show that a machine-learning model can anticipate elevated Lassa transmission weeks in Nigeria with AUROC 0.88 on an out-of-time hold-out — but only ~0.03 above a naive persistence baseline, with seasonality as the dominant signal. We make **no claim** of exceptional forecasting skill. The contribution is an open, reproducible, honestly-benchmarked pipeline and a pre-registered prospective-validation protocol, offered to NCDC and the Lassa research community. All code and data sources are public.
+Using real, triple-cross-validated NCDC surveillance data, we show that a machine-learning model can anticipate elevated Lassa transmission weeks in Nigeria with AUROC 0.88 on an out-of-time hold-out — but only ~0.03 above a naive persistence baseline, with seasonality as the dominant signal. We make **no claim** of exceptional forecasting skill. The contribution is an open, reproducible, honestly-benchmarked pipeline, with append-only forecast-logging infrastructure to enable prospective validation, offered to NCDC and the Lassa research community. All code and data sources are public.
 
 ------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ Using real, triple-cross-validated NCDC surveillance data, we show that a machin
 2. **National, not per-state.** The validated weekly series is national. Per-state weekly counts appear in NCDC reports as image tables not amenable to text extraction; the SORMAS data (2018–2021) provide a per-state view but at individual-level and for a different period. Per-state weekly forecasting is future work.
 3. **No environmental covariates in the national model.** Unlike a state-level analysis, national-average weather is not epidemiologically meaningful; the model uses surveillance history and seasonality only.
 4. **Reporting completeness.** Confirmed counts are laboratory-confirmed only and under-report true incidence given uneven diagnostic access; the model predicts reported confirmed activity, not true incidence.
-5. **No prospective validation yet.** All metrics are retrospective; prospective validation is the pre-registered next step.
+5. **No prospective validation yet.** All metrics are retrospective; prospective validation is the planned next step, and append-only forecast logging is already in place to support it.
 
 ------------------------------------------------------------------------
 
