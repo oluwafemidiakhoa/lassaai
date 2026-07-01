@@ -1,341 +1,142 @@
 # LassaAI
 
-**AI-powered Lassa fever outbreak prediction and clinical decision support for Nigeria.**
+**An open, honestly-benchmarked national early-warning model and clinical decision-support aid for Lassa fever in Nigeria.**
 
-Built by Oluwafemi Idiakhoa · Houston, TX  
+Built by Oluwafemi Idiakhoa · Houston, TX
 Open source · MIT License · 2026
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
-[![Data: NCDC](https://img.shields.io/badge/data-NCDC%20Nigeria-orange.svg)](https://ncdc.gov.ng)
+[![Data: NCDC + SORMAS](https://img.shields.io/badge/data-NCDC%20%2B%20SORMAS-orange.svg)](https://ncdc.gov.ng)
 
 ---
 
-## What LassaAI Does
+## What LassaAI is (and what it isn't)
 
-Lassa fever kills thousands of Nigerians every year. Current response is reactive —
-outbreaks are detected after they have already grown. LassaAI is an open-source
-platform that combines:
+Lassa fever is endemic in Nigeria and the national response is largely reactive. LassaAI is an **open, reproducible pipeline** that asks a modest, honest question: can we anticipate weeks of *elevated* national transmission a month ahead — and does a model actually beat a trivial baseline?
 
-- **Outbreak prediction** — forecast which Nigerian states are at risk 4–8 weeks
-  before an outbreak occurs
-- **Clinical decision support** — help healthcare workers in Nigeria assess
-  Lassa fever probability at point of care
-- **Drug discovery** — track antiviral candidates and their evidence tier
+**It is:** a national weekly early-warning proof of concept on **real, cross-validated NCDC data**, benchmarked against naive baselines, plus a point-of-care clinical-probability aid and an antiviral-evidence tracker.
+
+**It is not:** a validated clinical or operational forecasting system. The model beats a naive persistence baseline only slightly; genuine skill can only be shown prospectively. We make **no claim of exceptional accuracy.**
+
+> A companion preprint describes the method and results in full. See `docs/lassa/paper-draft.md`.
 
 ---
 
-## Live Platform
+## Live platform
 
 | Feature | URL |
-|---------|-----|
-| Outbreak forecast board | gailabai.com/boards |
-| Clinical copilot | gailabai.com/lassa-copilot |
-| Drug discovery pipeline | gailabai.com/boards (Lassa board) |
+|---|---|
+| Outbreak dashboard | https://www.gailabai.com/lassa |
+| Clinical copilot | https://www.gailabai.com/lassa-copilot |
+| One-page summary | https://www.gailabai.com/lassa-summary |
 
 ---
 
-## Outbreak Prediction Model
+## National early-warning model
 
-### Data
-- **Source:** NCDC weekly epidemiological reports
-- **Weather:** Open-Meteo historical API
-- **Coverage:** All 37 Nigerian states plus FCT
-- **Period:** 2011–2026
-- **Observations:** 27,861 state-week records
-- **Total confirmed cases in dataset:** 8,138
-- **Total deaths in dataset:** 910
+### Data (real, triple-cross-validated)
+- **National weekly incidence, 2020–2025** — NCDC Weekly Epidemiological Reports, via a provenance-tracked public compilation *and* our own independent re-extraction (`scripts/lassa/rebuild-ncdc-real.py`). The two extractions and NCDC's published annual totals agree within **~1%** (e.g. 2020: 1,190 vs 1,189; 2024: 1,311 vs 1,309).
+- **Annual confirmed cases:** 2020 = 1,190 · 2021 = 511 · 2022 = 1,042 · 2023 = 1,271 · 2024 = 1,311 · 2025 = 1,131 (total 6,456).
+- **Individual-level cross-check (2018–2021):** the de-identified SORMAS dataset (20,062 records, CC-BY-4.0) — its February peak and Edo/Ondo/Ebonyi/Bauchi ranking independently corroborate the national series.
+- Seasonality is correct: incidence peaks in the **dry season (Nov–Apr)**, troughs May–Sep.
 
 ### Method
-- **Model:** XGBoost classifier
-- **Target:** Will this state report more than 5 confirmed cases in the next 4 weeks?
-- **Validation:** Temporal holdout — no random splits (prevents data leakage)
+- **Target:** will the next 4 weeks carry an *above-median* confirmed-case burden (an "elevated-transmission week")? Chosen because national weekly incidence is never zero, so a ">0/>5" target is trivially always-true. Balanced target: 56% positive.
+- **Model:** XGBoost, 9 features (lagged/rolling confirmed counts, trend, epi-week, dry-season flag). No weather (national-average weather is not epidemiologically meaningful).
+- **Split:** strictly temporal — train ≤2023, test 2024, 2025 reserved.
+- **Benchmarked against naive persistence baselines** (recent 4-week average; previous-week count).
 
-| Split | Period |
-|-------|--------|
-| Train | 2011–2021 |
-| Validate | 2022–2023 |
-| Test | 2024–2025 |
+### Performance — read the model *and* the baseline together
 
-### Performance
+| Model | AUROC (2024 hold-out) | Precision | Recall |
+|---|---|---|---|
+| **XGBoost (9 features)** | **0.880** | 0.93 | 0.78 |
+| Naive: recent 4-week average | 0.849 | — | — |
+| Naive: previous-week count | 0.848 | — | — |
 
-| Metric | Test set (2024–25) |
-|--------|--------------------|
-| AUROC | **0.9994** |
-| Precision | 0.9100 |
-| Recall | 1.0000 |
-| F1 Score | 0.9529 |
+The model beats the best naive baseline by only **~0.03 AUROC**. Most of the discrimination is **seasonality and recent incidence** — which the baselines also capture. The top predictor is the **dry-season flag (≈53% gain importance)**, i.e. the model is learning the real Nov–Apr season, not a data artefact. This is a modest, believable result, **not a breakthrough.**
 
-Baseline (random classifier): AUROC 0.50
-
-**Confusion matrix (test set):**
-
-|  | Predicted negative | Predicted positive |
-|--|--------------------|--------------------|
-| **Actual negative** | 3,648 (TN) | 18 (FP) |
-| **Actual positive** | 0 (FN) | 182 (TP) |
-
-Zero false negatives on the test set — no outbreak weeks were missed.
-
-### Important note on model performance
-
-Test AUROC of 0.9994 reflects the strong seasonal and geographic predictability
-of Lassa fever in Nigeria. Edo, Ondo, Bauchi, Taraba, and Ebonyi account for the
-majority of cases and peak consistently during the dry season (November through April).
-
-This predictability is clinically useful — it means the model can reliably identify
-when and where to pre-position resources — but AUROC alone does not capture
-performance on rare high-outbreak weeks where prediction is hardest.
-
-Prospective validation against 2026 NCDC data is ongoing. Results will be published
-when sufficient data is available.
-
-### Class balance
-
-Of 27,417 modelling rows, **6.1% are outbreak weeks** (outbreak = 1) and **93.9% are
-non-outbreak weeks** (outbreak = 0). This imbalance is expected and ecologically
-accurate: Nigeria has 37 states and 52 weeks per year, but Lassa fever outbreaks
-are geographically concentrated (5 states account for >90% of cases) and
-seasonally concentrated (dry season, November–April). A model that predicts "no
-outbreak" every week would achieve 93.9% accuracy but near-zero recall — which is
-why AUROC and recall are the primary evaluation metrics.
-
-### Top Predictive Features
-
-| Feature | Importance |
-|---------|-----------|
-| 8-week rolling case average | 49.6% |
-| Cases 1 week prior | 26.1% |
-| 4-week rolling case average | 13.6% |
-| Cases 2 weeks prior | 2.2% |
-| Weeks into dry season | 1.8% |
-| Month of year | 1.7% |
-| Cases 8 weeks prior | 1.3% |
-| High-risk state (Ondo) | 0.6% |
-| High-risk state (Edo) | 0.6% |
-
-Epidemiological signals dominate (93%+). Weather and seasonality provide
-the remaining signal — consistent with known Lassa ecology.
-
-### Current Forecast
-All 37 Nigerian states: **LOW risk** (Week 22, 2026)
-
-This is expected — it is wet season (May through October). Lassa fever
-peaks during the dry season (November through April).
-
-Historically highest risk states: **Edo · Ondo · Bauchi · Taraba · Ebonyi**
+### Honest limitations
+- Modest gain over a naive baseline; retrospective metrics overstate operational value.
+- **National, not per-state.** Per-state weekly counts are published by NCDC as image tables (not text-extractable); the per-state view on the dashboard is an **illustrative prototype**, not validated. Per-state weekly forecasting is future work (SORMAS gives a 2018–2021 per-state view).
+- Confirmed counts under-report true incidence.
+- **No prospective validation yet** — the genuine test. Append-only forecast logging (`data/lassa/prospective-log.jsonl`) is in place to support it.
 
 ---
 
 ## Clinical Copilot
 
-A symptom-based probability calculator for healthcare workers in Nigeria.
+A symptom-based probability aid for healthcare workers. **It does not diagnose Lassa fever** and is **not independently validated** — it provides probability estimates to support clinical judgment; all results require RT-PCR confirmation. Symptom weights are literature-derived (McCormick 1987; Okokhere 2018; WHO 2017) and consistent with the SORMAS clinical fields (fever, sore throat, facial/neck oedema).
 
-**IMPORTANT: This tool does not diagnose Lassa fever.** It provides probability
-estimates to support clinical judgment. All results require laboratory confirmation
-by a qualified healthcare professional.
-
-### How it works
-A healthcare worker enters:
-- Patient symptoms (fever, sore throat, chest pain, mucosal bleeding, etc.)
-- Exposure history (contact with cases, rodents, high-risk areas)
-- State of residence
-
-The tool returns:
-- Lassa fever probability score (0–95%)
-- Risk category (LOW / MODERATE / HIGH / VERY HIGH)
-- Differential diagnosis
-- Recommended clinical actions
-- NCDC reporting instructions
-
-### Report suspected cases immediately
-**NCDC Emergency Line:** 0800-970000-10  
-Available: 24 hours, 7 days, toll-free  
-Online: ncdc.gov.ng/report  
-Email: info@ncdc.gov.ng
+**Report suspected cases:** NCDC Emergency Line **0800-970000-10** (24/7, toll-free) · ncdc.gov.ng/report
 
 ---
 
-## Drug Discovery Pipeline
-
-Antiviral candidates ranked by evidence tier:
+## Antiviral evidence tracker
 
 | Drug | Tier | Status |
-|------|------|--------|
-| Ribavirin | I | FDA approved (orphan drug) — current standard of care |
+|---|---|---|
+| Ribavirin | I | FDA-approved (orphan) — current standard of care |
 | Favipiravir | I | Investigational — superior in animal models |
 | Molnupiravir (MK-4482) | II | Investigational broad-spectrum antiviral |
-| Galidesivir | II | Investigational — RNA polymerase inhibitor |
 
-Full evidence pipeline integrated with GaiaLab biological evidence platform.
+Computational evidence tiers only — not clinical efficacy.
 
 ---
 
-## How to Run Locally
+## Reproduce it
 
-### Requirements
-Python 3.9 or higher
-
-### Install dependencies
 ```bash
 git clone https://github.com/oluwafemidiakhoa/lassaai.git
 cd lassaai
 pip install -r requirements.txt
+
+# 1) Real NCDC national weekly data (re-extract from sitreps, or use the committed CSV)
+python scripts/lassa/rebuild-ncdc-real.py          # -> data/lassa/ncdc-real.csv
+
+# 2) Train the national model + print honest metrics vs naive baselines
+python scripts/lassa/build-real-national.py
+
+# 3) Regenerate the figures
+python scripts/lassa/generate-figures-real.py
 ```
 
-### Collect data
-```bash
-python scripts/collect-ncdc-data.py
-python scripts/collect-weather-data.py
-python scripts/merge-datasets.py
-```
+The validated national series used for the paper is `data/lassa/lassa_fever_timeseries_full.csv` (NCDC WER compilation, 2020–2025).
 
-### Train the model
-```bash
-python scripts/train-model.py
-```
-
-### Generate current forecast
-```bash
-python scripts/forecast-now.py
-```
+> **Deprecated:** the older `scripts/lassa/collect-ncdc-data.py` + `build-features.py` + `train-model.py` pipeline produced a **synthetic** per-state series (annual totals distributed by a fixed formula, with inverted seasonality) and a misleading AUROC. Those files and `data/lassa/lassa-merged.csv` / `features.csv` / `ncdc-cases.csv` are retained only for history — **do not use them.**
 
 ---
 
-## Repository Structure
+## Data sources
 
-```
-lassaai/
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── scripts/
-│   ├── collect-ncdc-data.py
-│   ├── collect-weather-data.py
-│   ├── build-features.py
-│   ├── train-model.py
-│   └── forecast-now.py
-├── data/
-│   └── lassa/
-│       ├── ncdc-cases.csv
-│       ├── weather-by-state.csv
-│       ├── lassa-merged.csv         (27,861 state-week observations)
-│       ├── features.csv
-│       ├── feature-importance.csv
-│       ├── calibration-curve.png
-│       └── current-forecast.json
-├── models/
-│   └── lassa/
-│       └── outbreak-model-v1.pkl    (trained XGBoost model)
-├── docs/
-│   └── lassa/
-│       ├── paper-draft.md
-│       ├── data-sources.md
-│       └── grant-outline.md
-└── public/
-    └── lassa-copilot.html
-```
-
----
-
-## Data Sources
-
-All data used in this project is publicly available. No patient data is used or stored.
+All data are public, aggregate or de-identified. No identifiable patient data are used.
 
 | Source | Description | License |
-|--------|-------------|---------|
-| NCDC Nigeria | Weekly Lassa fever situation reports | Public domain |
-| Open-Meteo | Historical weather data by state capital | CC BY 4.0 |
-| ClinicalTrials.gov | Antiviral drug trial records | Public domain |
-| WHO | Outbreak reports and clinical guidance | Public domain |
-
----
-
-## Scientific Context
-
-Lassa fever is endemic to West Africa and causes significant mortality in Nigeria,
-with an estimated 300,000 infections and 5,000 deaths annually (WHO estimate).
-
-The multimammate rat (*Mastomys natalensis*) is the primary reservoir. Transmission
-to humans occurs through contact with infected rodent urine or droppings, or
-person-to-person contact with infected blood or body fluids.
-
-Current antiviral therapy (ribavirin) has limited efficacy and significant toxicity.
-No approved vaccine exists. Early prediction and clinical recognition are the most
-actionable current interventions.
+|---|---|---|
+| NCDC Nigeria | Weekly Lassa fever situation reports (primary) | Public |
+| NCDC WER compilation (Kaggle) | Provenance-tracked weekly series 2020–2025 | Public |
+| SORMAS (Zenodo 10.5281/zenodo.7309567) | Individual-level Lassa data 2018–2021 | CC-BY-4.0 |
+| ClinicalTrials.gov / WHO | Antiviral trials, clinical guidance | Public |
 
 ---
 
 ## Citation
 
-If you use LassaAI in your research please cite:
+> Idiakhoa, O. (2026). *Forecasting Elevated Lassa Fever Transmission Weeks in Nigeria from National Surveillance Data: A Baseline-Benchmarked Proof of Concept.* Preprint. github.com/oluwafemidiakhoa/lassaai
 
-> Idiakhoa, O. (2026). LassaAI: Machine learning prediction of Lassa fever outbreaks
-> in Nigerian states using epidemiological surveillance and environmental data.
-> GitHub: github.com/oluwafemidiakhoa/lassaai
-
-A peer-reviewed paper is in preparation for submission to PLOS Neglected Tropical Diseases.
-
----
-
-## Contributing
-
-Contributions are welcome from:
-- Nigerian epidemiologists and clinicians
-- Public health researchers
-- African academic institutions
-- WHO and NCDC technical staff
-- Open source developers
-
-Please open an issue before submitting a pull request. Clinical suggestions
-should include references to published literature.
-
----
-
-## Roadmap
-
-- [ ] Prospective validation (model predictions vs actual NCDC data)
-- [ ] Local government area (LGA) resolution (currently state-level only)
-- [ ] Clinical validation study at Irrua Specialist Teaching Hospital
-- [ ] NCDC partnership for real-time data feed
-- [ ] Mobile-optimised copilot for rural healthcare workers
-- [ ] Hausa language support
-- [ ] WHO situation report automation
+A preprint is in preparation.
 
 ---
 
 ## Contact
 
-**Oluwafemi Idiakhoa**  
-partnerships@gailabai.com  
-gailabai.com  
-Houston, TX
+**Oluwafemi Idiakhoa** · partnerships@gailabai.com · gailabai.com · Houston, TX
 
-For partnership inquiries from NCDC, WHO, or academic institutions
-please email partnerships@gailabai.com
+Partnership inquiries from NCDC, WHO, or academic institutions welcome.
 
 ---
 
 ## License
 
-MIT License — free to use, modify, and distribute with attribution.
-
-See [LICENSE](LICENSE) for full text.
-
-For clinical deployment in Nigerian health facilities please contact
-partnerships@gailabai.com for implementation guidance.
-
----
-
-## Disclaimer
-
-LassaAI outputs are computational research tools requiring expert validation
-before clinical or public health application.
-
-The clinical copilot is for decision support only — not for independent
-diagnosis of Lassa fever.
-
-Outbreak predictions require confirmation by qualified epidemiologists
-before informing public health response.
-
-This platform is not affiliated with NCDC, WHO, or any government health authority.
+MIT — see [LICENSE](LICENSE).
