@@ -190,6 +190,6 @@ The author thanks members of the Lassa fever research and clinical community for
 
 8.  Sogoba N, Feldmann H, Safronetz D. Lassa fever in West Africa: evidence for an expanded region of endemicity. *Zoonoses Public Health.* 2012;59 Suppl 2:43–47. doi:10.1111/j.1863-2378.2012.01469.x
 
-9.  Epidemiological data on Lassa fever in Nigeria, 2018–2021 (SORMAS) [dataset]. Zenodo; 2022. CC-BY-4.0. doi:10.5281/zenodo.7309567
+9.  Dan-Nwafor C. Epidemiological data on Lassa fever in Nigeria, 2018–2021 (SORMAS) [dataset]. Zenodo; 2022. CC-BY-4.0. doi:10.5281/zenodo.7309567
 
 10. Ficenec SC, Schieffelin JS, Emmett SD. A proposed scoring system for Lassa fever diagnosis to facilitate treatment and decrease mortality in resource-limited settings. *Trans R Soc Trop Med Hyg.* 2019;113(5):254–260. doi:10.1093/trstmh/try127
