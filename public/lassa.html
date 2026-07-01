@@ -248,8 +248,9 @@
   </div>
   <h1>Lassa Fever <span>Outbreak Intelligence</span></h1>
   <p>
-    ML-powered outbreak prediction for all 37 Nigerian states. Combines NCDC epidemiological
-    surveillance data, ERA5 climate reanalysis, and antiviral drug discovery — all updated weekly.
+    A national early-warning model for Nigeria built on real, cross-validated NCDC weekly
+    surveillance data (AUROC 0.88 vs 0.85 naive), with an illustrative per-state view and
+    Lassa antiviral drug discovery.
   </p>
   <div class="hero-actions">
     <a href="/analyze.html?genes=GPC,NP,L,Z&disease=lassa%20fever" class="btn btn-primary">
@@ -403,7 +404,7 @@
       model adds only ~0.03. Much of the signal is <em>seasonality</em> (the dry-season flag is the top
       predictor) and recent incidence. This is a modest, believable result, not a breakthrough; genuine
       forecasting value can only be shown prospectively, which is why a prospective-validation protocol
-      is pre-registered.
+      is planned, with append-only forecast logging already in place to support it.
     </p>
     <p style="margin-top:14px;font-size:0.78rem;color:var(--muted);">
       Data: NCDC Weekly Epidemiological Reports (2020–2025), cross-validated against an independent
