@@ -152,29 +152,31 @@
   </div>
 
   <!-- Performance metrics -->
-  <h2>Model Performance (Test Set 2024–2025, Prospective Holdout)</h2>
+  <h2>Model Performance (National model, 2024 out-of-time hold-out)</h2>
   <div class="metrics">
-    <div class="metric"><div class="num">0.9994</div><div class="lbl">AUROC</div></div>
-    <div class="metric"><div class="num">1.000</div><div class="lbl">Recall</div></div>
-    <div class="metric"><div class="num">0.910</div><div class="lbl">Precision</div></div>
-    <div class="metric"><div class="num">0.953</div><div class="lbl">F1 Score</div></div>
-    <div class="metric"><div class="num">0</div><div class="lbl">Missed outbreaks</div></div>
+    <div class="metric"><div class="num">0.880</div><div class="lbl">Model AUROC</div></div>
+    <div class="metric"><div class="num">0.849</div><div class="lbl">Naive baseline AUROC</div></div>
+    <div class="metric"><div class="num">0.93</div><div class="lbl">Precision</div></div>
+    <div class="metric"><div class="num">0.85</div><div class="lbl">F1 Score</div></div>
+    <div class="metric"><div class="num">±1%</div><div class="lbl">vs NCDC published</div></div>
   </div>
   <p style="font-size:9pt;color:var(--muted);font-family:-apple-system,sans-serif;">
-    Training used strict temporal cross-validation (train ≤2021, validate 2022–23, test 2024–25) to prevent data leakage.
-    All metrics are retrospective. <strong>Prospective validation is the immediate next step</strong> and the subject of a NIH Fogarty R21 application.
+    Target: whether the next 4 weeks carry above-median confirmed burden. Trained on real, cross-validated
+    NCDC weekly data (train ≤2023, test 2024). The model beats a naive persistence baseline by only ~0.03 AUROC;
+    the dominant predictor is dry-season timing. All metrics are retrospective — <strong>prospective validation
+    is the pre-registered next step</strong>.
   </p>
 
   <div class="two-col">
     <div>
       <!-- What it does -->
       <h2>What LassaAI Does</h2>
-      <p><strong>Outbreak Prediction Model</strong></p>
+      <p><strong>National Early-Warning Model</strong></p>
       <ul>
-        <li>Generates weekly outbreak probability for all 37 Nigerian states</li>
-        <li>4–8 week forward prediction horizon</li>
-        <li>Trained on 27,417 state-week observations, 2011–2026</li>
-        <li>Updates automatically when new NCDC sitrep data are available</li>
+        <li>Predicts elevated (above-median) national transmission over the next 4 weeks</li>
+        <li>Trained on real NCDC weekly data, 2020–2025 (cross-validated ±~1% vs published totals)</li>
+        <li>AUROC 0.88 vs 0.85 naive baseline — modest, honest, seasonality-driven</li>
+        <li>Per-state view is illustrative pending real per-state weekly data (future work)</li>
         <li>Live dashboard: <strong>gailabai.com/lassa</strong></li>
       </ul>
 
@@ -191,14 +193,12 @@
       <h2>Dataset</h2>
       <table>
         <tr><th>Item</th><th>Value</th></tr>
-        <tr><td>Time period</td><td class="val">2011–2026 (Week 22)</td></tr>
-        <tr><td>States covered</td><td class="val">37 (all states + FCT)</td></tr>
-        <tr><td>Observations</td><td class="val">27,417 state-weeks</td></tr>
-        <tr><td>Confirmed cases</td><td class="val">8,138</td></tr>
-        <tr><td>Deaths</td><td class="val">910</td></tr>
-        <tr><td>Case source</td><td>NCDC Weekly Situation Reports</td></tr>
-        <tr><td>Weather source</td><td>Open-Meteo ERA5 reanalysis</td></tr>
-        <tr><td>Outbreak rate</td><td>6.1% (1,684 positive / 25,733 negative)</td></tr>
+        <tr><td>Time period</td><td class="val">2020–2025 (national weekly)</td></tr>
+        <tr><td>Observations</td><td class="val">313 epidemiological weeks</td></tr>
+        <tr><td>Confirmed cases (2020–25)</td><td class="val">6,456</td></tr>
+        <tr><td>Case source</td><td>NCDC Weekly Epidemiological Reports (cross-validated)</td></tr>
+        <tr><td>Per-state / clinical</td><td>SORMAS 2018–2021 (CC-BY, DOI 10.5281/zenodo.7309567)</td></tr>
+        <tr><td>Elevated-week rate</td><td>56% (balanced, non-degenerate target)</td></tr>
       </table>
     </div>
 
