@@ -93,7 +93,7 @@ with open("models/lassa/outbreak-model-v1.pkl", "rb") as f:
     bundle = pickle.load(f)
 model = bundle["model"] if isinstance(bundle, dict) else bundle
 
-test_df = features_df[features_df["year"].isin([2024, 2025])].copy()
+test_df = features_df[features_df["year"] == 2024].copy()  # 2025-2026 had no case data
 FEATURE_COLS = [
     "month","dry_season","weeks_into_dry_season",
     "cases_lag1","cases_lag2","cases_lag4","cases_lag8","deaths_lag4",
@@ -108,26 +108,33 @@ probs  = model.predict_proba(X_test)[:, 1]
 fpr, tpr, thresholds = roc_curve(y_test, probs)
 roc_auc = auc(fpr, tpr)
 
-# find threshold closest to tpr=1.0, fpr=0.1
+# Naive baseline: previous-week case count alone (shows the model barely beats persistence)
+base_score = test_df["cases_lag1"].values
+b_fpr, b_tpr, _ = roc_curve(y_test, base_score)
+base_auc = auc(b_fpr, b_tpr)
+
+# find threshold closest to tpr=1.0
 op_idx = np.argmin(np.abs(tpr - 1.0))
 
 fig, ax = plt.subplots(figsize=(7, 6))
-ax.plot(fpr, tpr, color=TEAL, lw=2.5, label=f"LassaAI (AUROC = {roc_auc:.4f})")
+ax.plot(fpr, tpr, color=TEAL, lw=2.5, label=f"XGBoost, 19 features (AUROC = {roc_auc:.4f})")
 ax.fill_between(fpr, tpr, alpha=0.08, color=TEAL)
+ax.plot(b_fpr, b_tpr, color="#b45309", lw=2.0, linestyle=(0, (4, 2)),
+        label=f"Naive baseline: previous-week cases (AUROC = {base_auc:.4f})")
 ax.plot([0, 1], [0, 1], "--", color="#94a3b8", lw=1.2, label="Random (AUROC = 0.50)")
 ax.scatter([fpr[op_idx]], [tpr[op_idx]], s=90, zorder=5, color=RED,
            label=f"Operating point (Sensitivity=1.000, Specificity={1-fpr[op_idx]:.3f})")
 ax.set_xlabel("False Positive Rate  (1 − Specificity)", fontsize=12)
 ax.set_ylabel("True Positive Rate  (Sensitivity)", fontsize=12)
-ax.set_title("Figure 2  ROC curve — LassaAI outbreak prediction\nTest set: 2024–2025 out-of-time temporal holdout (retrospective)",
-             fontsize=12, fontweight="bold", pad=14)
+ax.set_title("Figure 2  ROC — LassaAI vs naive baseline (2024 holdout, retrospective)\nThe model improves on trivial persistence by only ~0.006 AUROC",
+             fontsize=11.5, fontweight="bold", pad=14)
 ax.legend(loc="lower right", fontsize=10)
 ax.set_xlim(-0.01, 1.01)
 ax.set_ylim(-0.01, 1.05)
 ax.grid(color="#e2e8f0", lw=0.6)
 props = dict(boxstyle="round", facecolor="#f0fdf4", alpha=0.9, edgecolor="#86efac")
 ax.text(0.38, 0.12,
-        f"AUROC = {roc_auc:.4f}\nPrecision = 0.910\nRecall = 1.000\nF1 = 0.953\nFalse negatives = 0",
+        f"XGBoost AUROC = {roc_auc:.4f}\nNaive baseline = {base_auc:.4f}\nPrecision = 0.929\nRecall = 1.000\nF1 = 0.963",
         transform=ax.transAxes, fontsize=10, verticalalignment="bottom", bbox=props)
 plt.tight_layout()
 plt.savefig(OUT / "figure2_roc_curve.png", dpi=300, bbox_inches="tight")

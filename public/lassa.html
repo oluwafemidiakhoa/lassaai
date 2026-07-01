@@ -381,30 +381,33 @@
       Trained with strict temporal cross-validation — no data leakage between train/validate/test splits.
     </p>
     <div class="model-metrics">
-      <div class="metric"><div class="val">0.9994</div><div class="key">Test AUROC</div></div>
+      <div class="metric"><div class="val">0.9993</div><div class="key">Model AUROC (2024)</div></div>
+      <div class="metric"><div class="val">0.9928</div><div class="key">Naive baseline AUROC</div></div>
       <div class="metric"><div class="val">1.000</div><div class="key">Test Recall</div></div>
-      <div class="metric"><div class="val">0.910</div><div class="key">Test Precision</div></div>
-      <div class="metric"><div class="val">0.953</div><div class="key">Test F1</div></div>
-      <div class="metric"><div class="val">0</div><div class="key">Missed outbreaks (FN)</div></div>
-      <div class="metric"><div class="val">27,417</div><div class="key">Training rows</div></div>
+      <div class="metric"><div class="val">0.929</div><div class="key">Test Precision</div></div>
       <div class="metric"><div class="val">19</div><div class="key">Features</div></div>
-      <div class="metric"><div class="val">2012–2025</div><div class="key">Data coverage</div></div>
+      <div class="metric"><div class="val">2012–2024</div><div class="key">Case data</div></div>
     </div>
-    <p style="margin-top:20px;font-size:0.78rem;color:var(--muted);">
-      Top features: <strong style="color:var(--text);">8-week rolling case mean (49.6%)</strong>,
-      1-week lag cases (26.1%), 4-week rolling mean (13.6%), dry season timing (3.5% combined).
-      Weather variables (rainfall, humidity, temperature) contribute &lt;3% — recent case history
-      dominates, consistent with Lassa's focal rodent-reservoir transmission ecology.
+    <p style="margin-top:16px;font-size:0.82rem;color:var(--text);background:#0b3a3a;border:1px solid #14b8a6;border-radius:8px;padding:12px 14px;">
+      <strong>Read this before trusting the AUROC.</strong> A trivial one-feature baseline —
+      last week's case count alone — scores AUROC 0.9928 on the 2024 holdout. The 19-feature model
+      (0.9993) beats it by only ~0.006. The near-perfect score is therefore a property of the
+      <em>autoregressive</em> target (recent cases predict near-term cases), <strong>not</strong>
+      evidence of a powerful forecaster. Real forecasting skill can only be shown prospectively —
+      which is why we pre-registered a prospective-validation protocol rather than resting on this number.
+    </p>
+    <p style="margin-top:14px;font-size:0.78rem;color:var(--muted);">
+      Top features: 8-week rolling case mean (49.6%), 1-week lag cases (26.1%), 4-week rolling mean
+      (13.6%), dry-season timing (3.7% combined). Weather variables contribute ~1.2% combined.
     </p>
     <p style="margin-top:12px;font-size:0.78rem;color:var(--muted);">
-      <strong style="color:var(--text);">Limitations:</strong> Confirmed-case counts under-report
-      true incidence — Lassa is difficult to diagnose clinically and PCR access is uneven across
-      states — so both the prediction target and the dominant case-history features inherit
-      surveillance bias. Ideal predictors such as rodent-reservoir ecology are not yet available
-      at scale, so rainfall serves only as a partial environmental surrogate. Case data 2012–2015
-      are seed estimates (not direct NCDC surveillance counts). Weather is from ERA5 reanalysis at
-      state capital coordinates — intra-state variation not captured. Model should be treated as a
-      screening tool, not a replacement for NCDC field surveillance.
+      <strong style="color:var(--text);">Limitations:</strong> The high AUROC is largely autoregressive
+      (see above). Confirmed-case counts under-report true incidence (clinical diagnosis is hard, PCR
+      access uneven), so the target and features inherit surveillance bias. Part of the case series is
+      estimated (pre-2017 backfilled), and <strong>2025–2026 case data are not yet ingested</strong> —
+      so current forecasts are provisional and the all-LOW status partly reflects missing recent input.
+      Rodent-reservoir ecology (the ideal predictor) is unavailable at scale. Screening/research aid
+      only — not a validated diagnostic or a replacement for NCDC field surveillance.
     </p>
   </div>
 </div>

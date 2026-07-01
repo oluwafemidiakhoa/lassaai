@@ -36,21 +36,29 @@ with strict temporal cross-validation (train ≤2021, validation
 (outbreak rate 6.1%) was addressed via inverse-frequency weighting
 (scale_pos_weight = 15.3).
 
-**Results:** On the held-out 2024--2025 test set, the model achieved
-AUROC = 0.9994, recall = 1.000 (zero missed outbreaks), precision =
-0.910, and F1 = 0.953. The dominant predictive feature was the 8-week
-rolling mean of confirmed cases (importance 49.6%), followed by the
-1-week lag (26.1%) and 4-week rolling mean (13.6%). Dry-season timing
-variables (weeks into dry season, month, dry-season flag) contributed
-3.7% combined importance. Weather features (rainfall, humidity,
-temperature) contributed 1.2% combined.
+**Results:** On the held-out 2024 test set (2025 situation-report case
+data were not yet available at analysis time), the model achieved AUROC =
+0.9993, recall = 1.000, precision = 0.929, and F1 = 0.963. Critically,
+however, a naive one-feature baseline using only the previous week's
+confirmed-case count achieved AUROC = 0.9928, and the 8-week rolling mean
+alone achieved 0.9915 — so the 19-feature model improves on trivial
+persistence by only ~0.006 AUROC. The high discrimination therefore
+reflects the strong autoregressive structure of Lassa incidence (recent
+cases predict near-term cases) rather than novel predictive skill.
+Recent case history dominated feature importance (8-week rolling mean
+49.6%, 1-week lag 26.1%, 4-week rolling mean 13.6%); weather features
+contributed 1.2% combined.
 
-**Conclusions:** A temporally validated XGBoost model can predict Lassa
-fever outbreak weeks in Nigerian states with near-perfect sensitivity on
-historical data. The model is operationalised as a real-time forecasting
-dashboard. Prospective validation in partnership with NCDC is the
-immediate next step. We release all code and data openly to support
-replication and extension.
+**Conclusions:** Recent case history alone predicts near-term
+confirmed-case activity in Nigerian states with high discrimination, and
+the machine-learning model adds only marginal value over a naive
+persistence baseline. The contribution of this work is therefore not the
+(largely autoregressive) accuracy but an open, reproducible NCDC +
+climate data pipeline, an operational real-time dashboard, and a
+pre-registered prospective-validation protocol. Whether the approach
+offers genuine forecasting value — beyond naive persistence and on
+complete, real-time data — remains to be established prospectively. We
+release all code and data openly to support replication and scrutiny.
 
 ------------------------------------------------------------------------
 
@@ -62,7 +70,8 @@ Lassa fever is caused by *Lassa mammarenavirus* (LASV), a rodent-borne
 arenavirus transmitted primarily through contact with the multimammate
 rat *Mastomys natalensis* \[1\]. The disease is endemic across the Lassa
 fever belt of West Africa, encompassing Sierra Leone, Guinea, Liberia,
-and Nigeria. Nigeria reports the highest absolute burden globally.
+and Nigeria, with evidence of an expanding endemic range \[11\]. Nigeria
+reports the highest absolute burden globally.
 Between 2011 and 2026, the NCDC confirmed 8,138 cases and 910 deaths
 across all 37 administrative units in our dataset, with Edo (2,574
 cases), Ondo (1,638 cases), Bauchi (1,040 cases), Taraba (884 cases),
@@ -100,11 +109,14 @@ NCDC state-level weekly case counts with gridded ERA5 meteorological
 reanalysis data for all 37 Nigerian states, covering 2011--2026 (27,861
 state-week observations). 2. Trained and temporally validated an XGBoost
 outbreak prediction model with strict train/validation/test splits by
-calendar year to prevent data leakage. 3. Demonstrated near-perfect
-sensitivity (recall = 1.000) on an out-of-time temporal holdout spanning
-2024--2025. 4. Operationalised the model as an open-source real-time
-forecasting dashboard integrated with a clinical decision support
-copilot for healthcare workers.
+calendar year to prevent data leakage. 3. Benchmarked the model against
+naive persistence baselines, showing that its high discrimination on the
+2024 holdout (AUROC 0.9993) exceeds a one-feature baseline (previous-week
+case count, AUROC 0.9928) by only ~0.006 — i.e., the performance is
+largely attributable to autoregression rather than to the model. 4.
+Operationalised the pipeline as an open-source real-time dashboard and
+clinical-decision-support copilot, and pre-registered a
+prospective-validation protocol as the genuine test of forecasting value.
 
 This work establishes a proof-of-concept for machine learning-based
 Lassa fever early warning and provides a foundation for prospective
@@ -125,7 +137,7 @@ records) were used; no patient-identifiable data were accessed or
 processed.
 
 **Meteorological data:** Weekly meteorological variables were obtained
-via the Open-Meteo Historical Weather API (https://open-meteo.com),
+via the Open-Meteo Historical Weather API (https://open-meteo.com) \[7\],
 which provides ERA5 reanalysis data at 0.25° spatial resolution. For
 each state, coordinates corresponding to the state capital were used as
 the representative point. Variables retrieved were: daily precipitation
@@ -184,7 +196,7 @@ predicting outbreaks before they occur. The class imbalance rate was
 
 ### Model Training and Temporal Cross-Validation
 
-We trained an XGBoost gradient-boosted decision tree classifier (Chen &
+We trained an XGBoost gradient-boosted decision tree classifier \[13\] (Chen &
 Guestrin 2016) with the following hyperparameters:
 
   -----------------------------------------------------------------------
@@ -210,12 +222,24 @@ Guestrin 2016) with the following hyperparameters:
 **Temporal splits:** - **Train:** epidemiological weeks 2011 through
 2021 (years ≤2021) - **Validation:** epidemiological weeks 2022--2023
 (used for early stopping) - **Test (out-of-time temporal holdout):**
-epidemiological weeks 2024--2025
+epidemiological year 2024. Situation-report case data for 2025 and 2026
+were not yet available in the compiled dataset at analysis time (all 2025
+and 2026 state-weeks carried zero confirmed cases), so those years were
+excluded from evaluation to avoid an artificially inflated,
+all-negative test partition.
 
 No data from the validation or test periods was used in feature
 computation or model selection. This strict temporal split prevents the
 data leakage that would occur with random cross-validation on time
 series data.
+
+**Baseline comparison.** To assess whether the model provides value
+beyond the autoregressive structure of the data, we compared it against
+naive single-feature baselines that use only recent case counts (the
+previous-week count `cases_lag1`, and the 8-week rolling mean
+`cases_roll8`) as the predictor score. A large gap between the model and
+these baselines would indicate genuine added predictive skill; a small
+gap would indicate that discrimination is driven by persistence alone.
 
 ### Class Imbalance
 
@@ -277,28 +301,38 @@ focal geographic distribution of LASV transmission.
 ### Model Performance
 
 **Validation set (2022--2023):** AUROC = 0.9998\
-**Test set (2024--2025, out-of-time temporal holdout):** AUROC = 0.9994,
-Precision = 0.910, Recall = 1.000, F1 = 0.953
+**Test set (2024, out-of-time temporal holdout; n = 1,924 state-weeks,
+182 outbreak-positive):** AUROC = 0.9993, Precision = 0.929, Recall =
+1.000, F1 = 0.963, specificity = 0.992.
 
-The model achieved perfect recall on the test set: zero outbreak weeks
-were missed. Of all state-weeks predicted as outbreak-risk, 91.0% were
-true positives. The optimal stopping point was iteration 330 (of 500).
+The model missed no outbreak weeks on the 2024 holdout, and 92.9% of
+state-weeks it flagged as outbreak-risk were true positives.
 
-**Table 1. Model performance metrics.**
+**These numbers must be read alongside a naive baseline.** A trivial
+one-feature predictor using only the previous week's confirmed-case count
+(`cases_lag1`) achieved AUROC = 0.9928 on the same 2024 holdout, and the
+8-week rolling mean alone achieved AUROC = 0.9915. The full 19-feature
+XGBoost model (AUROC 0.9993) therefore improves on the best naive
+baseline by only ~0.006 AUROC. The high discrimination is thus almost
+entirely a property of the strongly autoregressive outbreak target
+(states with recent cases nearly always have cases in the following four
+weeks), not evidence that the machine-learning model has learned a
+non-trivial forecasting signal.
 
-  -----------------------------------------------------------------------
-  Metric                  Validation (2022--23)   Test (2024--25)
-  ----------------------- ----------------------- -----------------------
-  AUROC                   0.9998                  0.9994
+**Table 1. Model performance on the 2024 holdout, versus naive
+baselines.**
 
-  Precision               ---                     0.910
+  ----------------------------------------------------------------------
+  Model                                        AUROC   Precision   Recall
+  -------------------------------------------- ------- ----------- ------
+  XGBoost (19 features)                        0.9993  0.929       1.000
 
-  Recall (Sensitivity)    ---                     1.000
+  Naive baseline: previous-week cases          0.9928  ---         ---
 
-  F1-score                ---                     0.953
+  Naive baseline: 8-week rolling mean          0.9915  ---         ---
 
-  False negatives         ---                     0
-  -----------------------------------------------------------------------
+  Validation set (2022--2023), XGBoost         0.9998  ---         ---
+  ----------------------------------------------------------------------
 
 ### Feature Importance
 
@@ -356,13 +390,15 @@ drivers.
 
 ### Current Forecast Output
 
-As of epidemiological week 22 of 2026 (late May 2026), all 37 states are
-classified as LOW risk. This is consistent with the seasonal pattern:
-wet season (May--October) is historically associated with minimal Lassa
-fever transmission, as elevated rainfall and humidity suppress
-*Mastomys* activity and food storage practices that drive human
-exposure. Risk forecasts are updated weekly as new NCDC sitrep data are
-published.
+As of epidemiological week 22 of 2026, the model classifies all 37 states
+as LOW risk. This must be interpreted with caution: because the compiled
+case series carried no confirmed cases for 2025--2026, the model's recent
+case-history inputs for this period are effectively zero, and an
+autoregressive model fed zeros will predict low risk regardless of the
+true situation. The current all-LOW output therefore reflects the absence
+of recent input data as much as any genuine seasonal signal, and should
+be treated as provisional until the pipeline ingests complete, up-to-date
+NCDC situation reports.
 
 ------------------------------------------------------------------------
 
@@ -370,13 +406,20 @@ published.
 
 ### Interpretation of Model Performance
 
-The near-perfect AUROC (0.9994) and zero false negatives on the
-2024--2025 holdout reflect the strong autoregressive structure of Lassa
-fever incidence: states that had cases recently are highly likely to
-have cases again in the near term. This property --- focal geographic
-persistence --- is itself epidemiologically meaningful: it identifies
-the sustained endemicity of LASV in specific ecological niches rather
-than diffuse national transmission.
+The high AUROC (0.9993) and zero false negatives on the 2024 holdout
+reflect the strong autoregressive structure of Lassa fever incidence:
+states that had cases recently are highly likely to have cases again in
+the near term. We emphasise this directly, because it is the central
+caveat of the paper: a naive one-feature baseline (previous-week case
+count) achieves AUROC 0.9928 on the same holdout, so the elaborate
+19-feature model improves on trivial persistence by only ~0.006. The
+near-perfect discrimination is therefore not evidence of a powerful
+learned forecaster — it is a near-tautological consequence of defining
+the outbreak target from the same case series that supplies the model's
+dominant features. This property --- focal geographic persistence --- is
+epidemiologically real (it reflects the sustained endemicity of LASV in
+specific ecological niches), but it means retrospective discrimination
+metrics substantially overstate any operational forecasting value.
 
 The dominance of case-history features over weather features should not
 be interpreted as evidence that environmental factors are unimportant
@@ -403,8 +446,8 @@ a state transitions from LOW to MODERATE or HIGH risk category.
 The model is complemented by the LassaAI Clinical Copilot, a Bayesian
 logistic regression tool designed for use by healthcare workers at the
 point of care, which estimates the probability of Lassa fever in febrile
-patients based on clinical symptoms and epidemiological exposure
-history.
+patients based on clinical symptoms and epidemiological exposure history,
+in the spirit of prior Lassa clinical scoring systems \[10\].
 
 ### Limitations
 
@@ -413,20 +456,23 @@ See Limitations section below.
 ### Comparison With Prior Work
 
 Prior machine learning applications to Lassa fever have been limited in
-scope. Ficenec et al. \[1\] and Colubri et al. \[10\] demonstrated
+scope. Ficenec et al. \[1\] and Colubri et al. \[9\] demonstrated
 ML-based prognosis tools for individual patient outcomes, but neither
-addressed population-level outbreak forecasting. Zhao et al. \[9\] built
+addressed population-level outbreak forecasting. Zhao et al. \[8\] built
 dengue forecasting models using random forests and neural networks with
-a broadly similar temporal validation framework; our AUROC compares
-favourably, though direct comparison is confounded by disease-specific
-epidemiology and different spatial granularities. To our knowledge,
-LassaAI is the first XGBoost-based, temporally validated, state-level
-Lassa fever outbreak prediction model trained on the full NCDC
-surveillance record and deployed as a publicly accessible operational
-platform.
+a broadly similar temporal validation framework. We deliberately avoid
+comparing headline AUROC values across studies: as our baseline analysis
+shows, a high AUROC on an autoregressive weekly-incidence target is easy
+to obtain and says little about forecasting skill, so cross-study AUROC
+comparisons are not meaningful without matched naive baselines. To our
+knowledge, LassaAI is the first openly released, reproducible,
+state-level Lassa fever pipeline for Nigeria deployed as an operational
+dashboard with a pre-registered prospective-validation protocol; that
+openness and the honest baseline comparison, rather than the accuracy
+figure, are its contribution.
 
 The dominance of case-history features over meteorological features is
-consistent with findings from Zhao et al. \[9\] in dengue, where lagged
+consistent with findings from Zhao et al. \[8\] in dengue, where lagged
 incidence was also the strongest predictor. This pattern may reflect a
 general property of focal vector-borne and rodent-borne diseases: once
 transmission is established in an area, its continuation is better
@@ -483,15 +529,17 @@ transmission-chain signal.
 
 ## Conclusion
 
-We present LassaAI, the first temporally validated machine learning
-system for state-level Lassa fever outbreak prediction in Nigeria.
-Trained on 15 years of NCDC weekly surveillance data for all 37 Nigerian
-administrative units, an XGBoost classifier achieves AUROC = 0.9994 and
-perfect recall (zero missed outbreaks) on an out-of-time 2024--2025
-temporal holdout (retrospective). The model operationalises decades of epidemiological evidence:
-recent case history, focal geographic persistence, and dry-season timing
-together explain the overwhelming majority of outbreak risk variation at
-the state level.
+We present LassaAI, an open, reproducible pipeline and operational
+dashboard for state-level Lassa fever outbreak prediction in Nigeria,
+built on 15 years of compiled NCDC surveillance and ERA5 climate data for
+all 37 administrative units. On an out-of-time 2024 holdout an XGBoost
+classifier attains AUROC = 0.9993 with perfect recall — but we show that a
+naive previous-week-case baseline attains AUROC = 0.9928 on the same data,
+so this discrimination is almost entirely a property of the autoregressive
+outbreak target, not of the model. We therefore make no claim of
+demonstrated forecasting skill. The value of this work lies in the open
+infrastructure and in a pre-registered protocol to test the approach where
+it actually matters: prospectively.
 
 Critically, no lives are yet saved by a retrospectively validated model.
 The clinical and public health value of LassaAI will be established
@@ -515,12 +563,32 @@ across West Africa from this neglected but preventable disease.
 
 ## Limitations
 
-1.  **NCDC reporting completeness.** Weekly sitrep data represent
+1.  **Discrimination is largely autoregressive — the model barely beats a
+    naive baseline.** This is the most important limitation. A one-feature
+    baseline (previous-week case count) reaches AUROC 0.9928 on the 2024
+    holdout, versus 0.9993 for the full model — a ~0.006 gain. The
+    outbreak target is defined from the same case series that supplies the
+    dominant features, so high retrospective discrimination is close to
+    tautological and should not be read as demonstrated forecasting skill.
+
+2.  **Data provenance and completeness.** The case series was compiled
+    from NCDC situation reports; pre-2017 records with incomplete
+    coverage were filled using estimated annual distributions, so a
+    portion of the training series is estimated rather than a direct
+    transcription of confirmed counts. Case data for 2025 and 2026 were
+    not available in the compiled dataset (all zeros); consequently the
+    2024 holdout is the only recent year with real signal, and the
+    dashboard's current forecasts are provisional until complete,
+    up-to-date reports are ingested. Figures should be reproduced against
+    an authoritative, fully up-to-date NCDC dataset before any operational
+    use.
+
+3.  **NCDC reporting completeness.** Weekly sitrep data represent
     laboratory-confirmed cases only. Given the overlap of Lassa fever
     symptoms with malaria, typhoid, and other febrile illnesses common
     in Nigeria, a substantial proportion of cases are likely
     undiagnosed. Reporting rates may vary by state, year, and testing
-    capacity. Our model predicts confirmed cases, not true incidence.
+    capacity. The model predicts confirmed cases, not true incidence.
 
 2.  **No prospective validation.** All performance metrics are
     retrospective. The model has not yet been evaluated on case data
@@ -603,15 +671,17 @@ Situation Reports 2011--2026.
 
 ![](figures/figure2_roc_curve.png)
 
-**Figure 2. Receiver operating characteristic (ROC) curve for the
-LassaAI outbreak prediction model.** ROC curve on the held-out
-2024--2025 test set (out-of-time temporal split; retrospective). The x-axis shows false
-positive rate (1 − specificity) and the y-axis shows true positive rate
-(sensitivity). The diagonal dashed line represents chance performance
-(AUROC = 0.50). The selected operating threshold is indicated with a
-filled circle at sensitivity = 1.000, specificity = 0.995. AUROC =
-0.9994. Shaded region represents the 95% bootstrap confidence interval
-(1,000 bootstrap samples with replacement, stratified by year-state).
+**Figure 2. ROC curve — model versus naive baseline (2024 holdout,
+retrospective).** ROC curves on the held-out 2024 test set for the
+19-feature XGBoost model (AUROC = 0.9993) and for a naive one-feature
+baseline using only the previous week's confirmed-case count (AUROC =
+0.9928). The two curves nearly overlap: the model improves on trivial
+persistence by only ~0.006 AUROC, illustrating that the high
+discrimination is a property of the autoregressive target rather than of
+the model. The x-axis is the false-positive rate (1 − specificity), the
+y-axis the true-positive rate (sensitivity); the diagonal marks chance
+(AUROC = 0.50). The model's operating point is at sensitivity = 1.000,
+specificity = 0.992.
 
 ![](figures/figure3_feature_importance.png)
 
@@ -634,7 +704,7 @@ x-axis and year on the y-axis. Colour intensity represents total weekly
 confirmed cases (white = 0, dark orange = highest). The dry season
 (November--April, indicated by grey shading) consistently corresponds to
 elevated case counts. Notable outbreaks visible in 2018 (declared
-national emergency by NCDC), 2020, 2022, and 2024.
+national emergency by NCDC \[12\]), 2020, 2022, and 2024.
 
 ![](figures/figure5_current_forecast.png)
 
@@ -686,44 +756,34 @@ https://www.gailabai.com/lassa.
     2024 \[cited 2026 May 30\]. Available from:
     https://open-meteo.com/en/docs/historical-weather-api
 
-8.  Sow MS, Etard JF, Baize S, Magassouba N, Faye O, Msellati P, et
-    al. New evidence of long-lasting persistence of Ebola virus genetic
-    material in survivor semen. *J Infect Dis.* 2016;214(10):1475--1476.
-    doi:10.1093/infdis/jiw078
-
-9.  Zhao N, Charland K, Carabali M, Nsoesie EO, Maheu-Giroux M, Rees E,
+8.  Zhao N, Charland K, Carabali M, Nsoesie EO, Maheu-Giroux M, Rees E,
     et al. Machine learning and dengue forecasting: comparing random
     forests and artificial neural networks for predicting weekly dengue
     incidence in San Juan, Puerto Rico. *PLOS Negl Trop Dis.*
     2020;14(9):e0008601. doi:10.1371/journal.pntd.0008601
 
-10. Colubri A, Silver T, Fradet T, Retzepi K, Fry B, Sabeti P.
+9. Colubri A, Silver T, Fradet T, Retzepi K, Fry B, Sabeti P.
     Transforming clinical data into actionable prognosis models:
     machine-learning framework and field-deployable app to predict
     outcome of Ebola patients. *PLOS Negl Trop Dis.*
     2016;10(3):e0004549. doi:10.1371/journal.pntd.0004549
 
-11. Ficenec SC, Schieffelin JS, Emmett SD. A proposed scoring system for
+10. Ficenec SC, Schieffelin JS, Emmett SD. A proposed scoring system for
     Lassa fever diagnosis to facilitate treatment and decrease mortality
     in resource-limited settings. *Trans R Soc Trop Med Hyg.*
     2019;113(5):254--260. doi:10.1093/trstmh/try127
 
-12. Sogoba N, Feldmann H, Safronetz D. Lassa fever in West Africa:
+11. Sogoba N, Feldmann H, Safronetz D. Lassa fever in West Africa:
     evidence for an expanded region of endemicity. *Zoonoses Public
     Health.* 2012;59 Suppl 2:43--47.
     doi:10.1111/j.1863-2378.2012.01469.x
 
-13. Ilori EA, Furuse Y, Ipadeola OB, Dan-Nwafor C, Abubakar A,
+12. Ilori EA, Furuse Y, Ipadeola OB, Dan-Nwafor C, Abubakar A,
     Womi-Eteng OE, et al. Epidemiologic and clinical features of Lassa
     fever outbreak in Nigeria, January 1--May 6, 2018. *Emerg Infect
     Dis.* 2019;25(6):1066--1074. doi:10.3201/eid2506.181035
 
-14. Hastie T, Tibshirani R, Friedman J. *The Elements of Statistical
+13. Hastie T, Tibshirani R, Friedman J. *The Elements of Statistical
     Learning: Data Mining, Inference, and Prediction.* 2nd ed. New York:
     Springer; 2009.
-
-15. Hernandez-Suarez CM, Mendoza-Cano O. Markov chain models for the
-    stochastic behavior of influenza and other respiratory illnesses and
-    the use of these models to assess interventions. *PLOS ONE.*
-    2018;13(3):e0192472. doi:10.1371/journal.pone.0192472
 
