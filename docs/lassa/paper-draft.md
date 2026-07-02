@@ -150,7 +150,7 @@ The author declares no competing interests.
 
 ## Acknowledgements
 
-The author thanks members of the Lassa fever research and clinical community for helpful discussions that informed the framing of this work's limitations and the design of the companion clinical decision-support tool. [Named acknowledgements to be added with the consent of the individuals concerned.]
+The author thanks Professor Robert F. Garry (Tulane University) for a helpful discussion on Lassa rodent ecology, rainfall, and the limitations of confirmed case-count surveillance, which informed the limitations described here. The author is also grateful to members of the Lassa fever clinical community whose input informed the design of the companion clinical decision-support tool. Named individuals have consented to being acknowledged; acknowledgement does not imply endorsement of the methods or conclusions.
 
 ------------------------------------------------------------------------
 
