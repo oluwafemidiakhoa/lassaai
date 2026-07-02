@@ -8,6 +8,7 @@ Open source · MIT License · 2026
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
 [![Data: NCDC + SORMAS](https://img.shields.io/badge/data-NCDC%20%2B%20SORMAS-orange.svg)](https://ncdc.gov.ng)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21122486.svg)](https://doi.org/10.5281/zenodo.21122486)
 
 ---
 
@@ -19,7 +20,7 @@ Lassa fever is endemic in Nigeria and the national response is largely reactive.
 
 **It is not:** a validated clinical or operational forecasting system. The model beats a naive persistence baseline only slightly; genuine skill can only be shown prospectively. We make **no claim of exceptional accuracy.**
 
-> A companion preprint describes the method and results in full. See `docs/lassa/paper-draft.md`.
+> **Preprint (open access):** [doi.org/10.5281/zenodo.21122486](https://doi.org/10.5281/zenodo.21122486). Manuscript source: `docs/lassa/paper-draft.md`.
 
 ---
 
@@ -123,9 +124,9 @@ All data are public, aggregate or de-identified. No identifiable patient data ar
 
 ## Citation
 
-> Idiakhoa, O. (2026). *Forecasting Elevated Lassa Fever Transmission Weeks in Nigeria from National Surveillance Data: A Baseline-Benchmarked Proof of Concept.* Preprint. github.com/oluwafemidiakhoa/lassaai
+> Idiakhoa, O. (2026). *Forecasting Elevated Lassa Fever Transmission Weeks in Nigeria from National Surveillance Data: A Baseline-Benchmarked Proof of Concept.* Zenodo. https://doi.org/10.5281/zenodo.21122486
 
-A preprint is in preparation.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21122486.svg)](https://doi.org/10.5281/zenodo.21122486)
 
 ---
 
