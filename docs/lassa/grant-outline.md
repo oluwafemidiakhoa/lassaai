@@ -1,6 +1,6 @@
 # LassaAI grant outline — SUPERSEDED (rebuild from the honest study before use)
 
-> ⚠️ **The preliminary-data claims in the previous version were fabricated** (tens of thousands of per-state rows over a multi-year synthetic date range, ERA5 weather, an AUROC near 0.99, and an implausibly perfect-recall claim). Do **not** submit any grant using those figures.
+> ⚠️ **The preliminary-data claims in the previous version were fabricated** (tens of thousands of per-state rows over a multi-year synthetic date range, ERA5 weather, an implausibly high near-tautological performance figure, and a perfect-recall claim). Do **not** submit any grant using those figures.
 
 The honest preliminary data are the **national, baseline-benchmarked** results:
 
