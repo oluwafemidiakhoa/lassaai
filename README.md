@@ -105,7 +105,7 @@ python scripts/lassa/generate-figures-real.py
 
 The validated national series used for the paper is `data/lassa/lassa_fever_timeseries_full.csv` (NCDC WER compilation, 2020–2025).
 
-> **Note on a retracted synthetic version.** An earlier iteration used a **synthetic** per-state series (annual national totals distributed across weeks/states by a fixed formula, with *inverted* seasonality) and reported a misleading near-perfect AUROC. Those data files and the scripts that generated them (`collect-ncdc-data.py`, `build-features.py`, `train-model.py`, `merge-datasets.py`, and the synthetic `lassa-merged.csv` / `features.csv` / `ncdc-cases.csv`) have been **removed** from the repository. They remain in the git history for full transparency about the correction. Do not resurrect them — use the real pipeline above.
+> **Note on a retracted synthetic version.** An earlier iteration used a **synthetic** per-state series (annual national totals distributed across weeks/states by a fixed formula, with *inverted* seasonality) and reported a misleadingly high, near-tautological AUROC. Those data files and the scripts that generated them (`collect-ncdc-data.py`, `build-features.py`, `train-model.py`, `merge-datasets.py`, and the synthetic `lassa-merged.csv` / `features.csv` / `ncdc-cases.csv`) have been **removed** from the repository. They remain in the git history for full transparency about the correction. Do not resurrect them — use the real pipeline above.
 
 ---
 

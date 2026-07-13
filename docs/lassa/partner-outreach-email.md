@@ -31,7 +31,7 @@ My name is Oluwafemi Idiakhoa, and I am the founder of GaiaLab, an AI-powered bi
 We have developed two open-source tools for Lassa fever:
 
 **1. Outbreak Prediction Model**  
-An XGBoost machine learning model trained on 15 years of NCDC weekly surveillance data and ERA5 meteorological reanalysis across all 37 Nigerian states. On a prospective holdout covering 2024–2025, the model achieved AUROC = 0.9994 with zero missed outbreak weeks (recall = 1.000). The model generates weekly state-level outbreak risk forecasts four to eight weeks in advance. A live dashboard is at https://www.gailabai.com/lassa
+An XGBoost machine learning model trained on NCDC Weekly Epidemiological Reports (national weekly series, 2020–2025; 313 weeks, 6,456 confirmed cases). On a strict out-of-time 2024 hold-out (a retrospective test, not a prospective evaluation), the model reached AUROC = 0.880 versus 0.849 for a naive four-week-average baseline — a modest ~0.03 gain, driven chiefly by dry-season timing. We present it as an honest, baseline-benchmarked proof of concept; prospective validation is the real test and has not yet been done. The model generates a weekly national elevated-transmission forecast about four weeks ahead (per-state forecasting is future work). A live dashboard is at https://www.gailabai.com/lassa
 
 **2. Clinical Copilot**  
 A Bayesian probability calculator for healthcare workers that estimates the likelihood of Lassa fever in febrile patients based on symptoms, vital signs, and epidemiological exposures. Weights are derived from published Lassa fever clinical literature including studies conducted at ISTH Irrua (Okokhere et al. 2018 Lancet Infect Dis) and FMC Owo. The copilot is freely accessible at https://www.gailabai.com/lassa-copilot

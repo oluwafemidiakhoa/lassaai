@@ -12,13 +12,9 @@ My name is Oluwafemi Idiakhoa, and I am the founder of GaiaLab, an AI-powered bi
 
 **What we have built**
 
-Over the past year, we have developed LassaAI — an open-source machine learning system that predicts Lassa fever outbreak risk at the state level in Nigeria, four to eight weeks in advance. The model was trained on 15 years of NCDC weekly situation reports (2011–2026) merged with ERA5 meteorological reanalysis data from all 37 Nigerian states.
+Over the past year, we have developed LassaAI — an open-source machine learning system that anticipates weeks of elevated **national** Lassa fever transmission in Nigeria about four weeks ahead. The model was trained on NCDC Weekly Epidemiological Reports (national weekly series, 2020–2025; 313 weeks, 6,456 confirmed cases cross-validated against NCDC annual totals).
 
-On a prospective holdout covering 2024 and 2025, the model achieved:
-- AUROC = 0.9994 (near-perfect discrimination)
-- Recall = 1.000 (zero missed outbreak weeks)
-- Precision = 0.910
-- F1 = 0.953
+On a strict out-of-time 2024 hold-out (a retrospective test, **not** a prospective evaluation), the model reached AUROC = 0.880 (precision 0.93, recall 0.78) for a non-degenerate target (56% of weeks positive). A naive four-week-average baseline reached AUROC = 0.849 — so the model's *added* skill over a trivial baseline is only ~0.03, with dry-season timing as the dominant signal. We want to be candid: this is a modest, honestly benchmarked proof of concept, not a claim of exceptional accuracy. The genuine test is prospective — predictions locked before outcomes are known — which we have not yet done.
 
 We have also developed a Clinical Copilot — a Bayesian probability calculator for healthcare workers at the point of care, which estimates the likelihood of Lassa fever in a febrile patient based on clinical symptoms and epidemiological exposures. Both tools are freely available, open-source, and designed to operate in low-resource settings without proprietary software.
 

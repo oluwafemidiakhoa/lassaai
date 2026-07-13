@@ -199,6 +199,7 @@
         <tr><td>Case source</td><td>NCDC Weekly Epidemiological Reports (cross-validated)</td></tr>
         <tr><td>Per-state / clinical</td><td>SORMAS 2018–2021 (CC-BY, DOI 10.5281/zenodo.7309567)</td></tr>
         <tr><td>Elevated-week rate</td><td>56% (balanced, non-degenerate target)</td></tr>
+        <tr><td>Preprint (open access)</td><td><a href="https://doi.org/10.5281/zenodo.21122486" target="_blank" rel="noopener">Zenodo, CC-BY · DOI 10.5281/zenodo.21122486</a></td></tr>
       </table>
     </div>
 
@@ -206,16 +207,18 @@
       <!-- Top features -->
       <h2>Top Feature Importance</h2>
       <div style="margin-bottom:10px;">
-        <div class="feat-row"><span class="feat-name">8-wk rolling cases</span><div class="feat-bar-track"><div class="feat-bar" style="width:100%"></div></div><span class="feat-pct">49.6%</span></div>
-        <div class="feat-row"><span class="feat-name">Cases lag 1 week</span><div class="feat-bar-track"><div class="feat-bar" style="width:53%"></div></div><span class="feat-pct">26.1%</span></div>
-        <div class="feat-row"><span class="feat-name">4-wk rolling cases</span><div class="feat-bar-track"><div class="feat-bar" style="width:27%"></div></div><span class="feat-pct">13.6%</span></div>
-        <div class="feat-row"><span class="feat-name">Cases lag 2 weeks</span><div class="feat-bar-track"><div class="feat-bar" style="width:5%"></div></div><span class="feat-pct">2.2%</span></div>
-        <div class="feat-row"><span class="feat-name">Weeks into dry season</span><div class="feat-bar-track"><div class="feat-bar" style="width:4%"></div></div><span class="feat-pct">1.8%</span></div>
-        <div class="feat-row"><span class="feat-name">Calendar month</span><div class="feat-bar-track"><div class="feat-bar" style="width:3.5%"></div></div><span class="feat-pct">1.7%</span></div>
-        <div class="feat-row"><span class="feat-name">Weather (combined)</span><div class="feat-bar-track"><div class="feat-bar" style="width:2.5%"></div></div><span class="feat-pct">~1%</span></div>
+        <div class="feat-row"><span class="feat-name">Dry-season flag</span><div class="feat-bar-track"><div class="feat-bar" style="width:100%"></div></div><span class="feat-pct">52.6%</span></div>
+        <div class="feat-row"><span class="feat-name">Rolling trend (4−8 wk)</span><div class="feat-bar-track"><div class="feat-bar" style="width:17%"></div></div><span class="feat-pct">8.8%</span></div>
+        <div class="feat-row"><span class="feat-name">Epidemiological week</span><div class="feat-bar-track"><div class="feat-bar" style="width:14%"></div></div><span class="feat-pct">7.5%</span></div>
+        <div class="feat-row"><span class="feat-name">Cases lag 1 week</span><div class="feat-bar-track"><div class="feat-bar" style="width:14%"></div></div><span class="feat-pct">7.2%</span></div>
+        <div class="feat-row"><span class="feat-name">8-wk rolling mean</span><div class="feat-bar-track"><div class="feat-bar" style="width:13%"></div></div><span class="feat-pct">6.8%</span></div>
+        <div class="feat-row"><span class="feat-name">4-wk rolling mean</span><div class="feat-bar-track"><div class="feat-bar" style="width:9%"></div></div><span class="feat-pct">4.9%</span></div>
+        <div class="feat-row"><span class="feat-name">Cases lag 8 weeks</span><div class="feat-bar-track"><div class="feat-bar" style="width:8%"></div></div><span class="feat-pct">4.2%</span></div>
+        <div class="feat-row"><span class="feat-name">Cases lag 2 weeks</span><div class="feat-bar-track"><div class="feat-bar" style="width:8%"></div></div><span class="feat-pct">4.1%</span></div>
+        <div class="feat-row"><span class="feat-name">Cases lag 4 weeks</span><div class="feat-bar-track"><div class="feat-bar" style="width:7%"></div></div><span class="feat-pct">3.9%</span></div>
       </div>
       <p style="font-size:8.5pt;color:var(--muted);font-family:-apple-system,sans-serif;">
-        Recent case history accounts for 89% of predictive power. Meteorological features (temperature, rainfall, humidity) contribute ~1%, consistent with published Lassa ecology literature.
+        Dry-season timing dominates (52.6% gain importance) — the model is learning the real November–April Lassa season, not a data artefact. Recent case history and trend supply the rest. The national model uses <strong>no meteorological covariates</strong>; national-average weather is not epidemiologically meaningful.
       </p>
 
       <!-- Proposed next steps -->
@@ -229,16 +232,21 @@
         <strong>Application deadline:</strong> October 16, 2026 (LOI due September 16, 2026)
       </p>
 
-      <!-- Top states -->
-      <h2>Top 5 States by Confirmed Cases (2011–2026)</h2>
-      <table>
-        <tr><th>State</th><th>Confirmed Cases</th><th>Note</th></tr>
-        <tr><td>Edo</td><td class="val">2,574</td><td class="sub">ISTH Irrua referral base</td></tr>
-        <tr><td>Ondo</td><td class="val">1,638</td><td class="sub">FMC Owo / ILFRC site</td></tr>
-        <tr><td>Bauchi</td><td class="val">1,040</td><td class="sub"></td></tr>
-        <tr><td>Taraba</td><td class="val">884</td><td class="sub"></td></tr>
-        <tr><td>Ebonyi</td><td class="val">728</td><td class="sub"></td></tr>
-      </table>
+      <!-- Endemic states — honest ranking from SORMAS, NO fabricated per-state totals -->
+      <h2>Most-Affected States (endemic ranking)</h2>
+      <p style="font-size:9.5pt;line-height:1.5;">
+        From the individual-level SORMAS 2018–2021 data, the endemic states rank
+        <strong>Edo &gt; Ondo &gt; Ebonyi &gt; Bauchi</strong>, consistent with published NCDC
+        reporting. Edo (ISTH Irrua) and Ondo (FMC Owo / ILFRC) host the principal
+        treatment and reference centres.
+      </p>
+      <p style="font-size:9pt;color:var(--muted);line-height:1.5;">
+        <strong>Validated per-state weekly case counts are not yet available</strong> — NCDC
+        publishes them as image tables not amenable to extraction. Obtaining structured
+        per-state data (proposed in partnership with NCDC) to build and prospectively validate
+        a per-state model is the immediate next step. No per-state cumulative totals are shown
+        here because none have been validated.
+      </p>
     </div>
   </div>
 
