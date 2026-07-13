@@ -1,10 +1,13 @@
 # LassaAI National Early-Warning — Prospective Validation Protocol (pre-registration)
 
-**Status: DRAFT v0.1 — NOT YET FROZEN.** Values marked **«CONFIRM»** are proposed by the
-analyst and must be reviewed, adjusted, and confirmed by the author before this protocol is
-frozen. Freezing = committing a version with `Status: FROZEN v1.0` and the hashes in §2; the
-git commit timestamp is the pre-registration record. Nothing here is binding until frozen,
-and freezing must occur **before** any prospective forecast is scored.
+**Status: CRITERIA COMMITTED v1.0 (2026-07-13).** The scientific criteria below were set by
+the acting Chief Scientist on the author's delegation and are committed as of this git commit
+— the commit timestamp is the pre-registration record. They may be amended **only before the
+first scored forecast** (tracked as v1.x in git history); **no change is permitted after the
+first scored forecast is logged.** The model code-commit hash and dataset content-hash (§2)
+are stamped at the *pre-season freeze*, immediately before the first forecast, and must
+reference a commit dated before it. The author (Oluwafemi Idiakhoa) retains final sign-off (§15)
+and may adjust any committed value before the pre-season freeze.
 
 This document pre-registers — *before outcomes are known* — how the national LassaAI
 elevated-transmission model will be judged as a genuine forward forecaster during the
@@ -23,17 +26,18 @@ that a forecast prevents cases. Retrospective performance (out-of-time 2024): AU
 vs naive **0.849** (~0.03 gain). The honest open question this protocol answers: *does the
 model beat a trivial seasonal baseline prospectively?*
 
-## 2. Model under evaluation (frozen at registration)
+## 2. Model under evaluation (frozen)
 - **Model version:** `national-elevated-transmission-v1`
-- **Code commit hash:** «CONFIRM — fill the `git rev-parse HEAD` at freeze»
-- **Feature set (frozen):** 9 features — `conf_lag1,2,4,8`, `roll4`, `roll8`, `roll_trend`, `epi_week`, `dry_season` (see `scripts/lassa/build-real-national.py`)
-- **Training data:** national weekly series 2020–2025 (`data/lassa/lassa_fever_timeseries_full.csv`), content hash «CONFIRM — SHA-256 at freeze»
-- **Elevated threshold (frozen):** next-4-week confirmed burden **> 32** (median 4-week burden of the training period, years ≤2023). **«CONFIRM»** — freeze the exact integer.
-- The model and threshold are **frozen**; any change after freeze = a new protocol version, disclosed in git history.
+- **Fitting rule (frozen):** each forecast week, XGBoost is retrained on **all labelled weeks up to the forecast week** (expanding window) using the frozen 9-feature spec and the frozen hyperparameters in `scripts/lassa/national-forecast-now.py`. No manual tuning between weeks. (This rule is automation-safe: it needs no human in the loop.)
+- **Feature set (frozen):** `conf_lag1,2,4,8`, `roll4`, `roll8`, `roll_trend`, `epi_week`, `dry_season`.
+- **Elevated threshold (FROZEN = 32):** next-4-week confirmed burden **> 32**, the median 4-week burden of the training period (years ≤2023). This value is **fixed for the entire evaluation and never re-derived** from later data.
+- **Stamped at the pre-season freeze, before the first forecast:** model code-commit hash `«stamp»` and dataset content-hash (SHA-256 of `lassa_fever_timeseries_full.csv`) `«stamp»`.
+- Fitting rule, features, and threshold are frozen; any change = a new protocol version, disclosed in git history.
 
-## 3. Data source & refresh
+## 3. Data source, refresh & cadence
 - **Source:** NCDC Weekly Epidemiological Reports (national weekly confirmed cases).
-- **Refresh:** `scripts/lassa/refresh-national-series.py` (scrape → cumulative-to-weekly → append; gap-safe; cross-checked vs NCDC cumulative). Run weekly before forecasting.
+- **Refresh:** `scripts/lassa/refresh-national-series.py` (scrape → cumulative-to-weekly → append; gap-safe; cross-checked vs NCDC cumulative).
+- **Cadence:** weekly, run **manually or on an automated weekly schedule**. Automation is permitted **only if** it: (a) runs the *same* honesty-guarded logger unchanged; (b) treats the refresh cross-check (§6) and gap/negative-diff detection as a **HARD GATE** — on any anomaly it **aborts and alerts a human, and logs nothing** (a bad scrape must never silently enter the record); (c) uses the frozen fitting rule + threshold (§2); and (d) records each forecast as its own **git commit** (the commit timestamp is the tamper-evident proof the forecast preceded the outcome). No path may write a forecast that bypasses the logger.
 
 ## 4. Endpoint definitions
 - **Forecast horizon:** 4 weeks ahead of the last observed week.
@@ -60,16 +64,19 @@ model beat a trivial seasonal baseline prospectively?*
 ## 9. Decision threshold / risk bands (operational only; do not affect primary AUROC)
 - Alert if `P(elevated) ≥ 0.50`. Risk bands: LOW <0.25, MODERATE 0.25–0.50, HIGH 0.50–0.75, VERY HIGH ≥0.75. Frozen at registration.
 
-## 10. Evaluation window & readout dates (pre-specified) — **«CONFIRM»**
-- **Logging starts:** «CONFIRM — target on/before 2026-10-01, before dry-season onset».
-- **Primary evaluation window:** dry season, ISO weeks 2026-W45 → 2027-W17 (≈ Nov–Apr).
-- **Readouts (published pass/fail/neutral, no cherry-picking):** interim at 2027-W05; **primary** after 2027-W21 (allowing the last 4-week outcome window to close).
+## 10. Evaluation window & readout dates (committed)
+- **Logging starts:** on or before **2026-10-01** (before dry-season onset), once the series is refreshed to the current epi-week.
+- **Primary evaluation window:** dry season, ISO weeks **2026-W45 → 2027-W17** (≈ Nov–Apr).
+- **Readouts (published pass / neutral / fail, no cherry-picking):** interim at **2027-W05**; **primary** after **2027-W21** (allowing the last 4-week outcome window to close).
 
-## 11. Success / neutral / failure criteria — **«CONFIRM: author owns these thresholds»**
-*Proposed, principled defaults (modest, consistent with the ~0.88/+0.03 retrospective result and allowing for prospective degradation). The author must confirm or change these before freeze.*
-- **SUCCESS:** prospective AUROC ≥ **0.75** **and** AUROC exceeds the best naive baseline by ≥ **0.02** (95% CI lower bound of the gain > 0) **and** Brier ≤ the baseline's.
-- **NEUTRAL / no added skill (a legitimate, publishable result):** model AUROC ≈ baseline (gain < 0.02, or CI of the gain spans 0) — i.e., seasonality explains the signal.
-- **FAILURE:** prospective AUROC < baseline, **or** AUROC < **0.70**, **or** fewer than **10** scoreable weeks with both outcome classes (insufficient power — reported as inconclusive-underpowered).
+## 11. Success / neutral / failure criteria (committed v1.0)
+**The binding test is the gain over the naive baseline (§7), not the absolute AUROC.** Because
+elevated weeks are strongly autocorrelated and seasonal, a high *absolute* AUROC is largely
+attributable to seasonality that the baseline also captures; the scientific claim is *added
+skill over that baseline*.
+- **SUCCESS:** prospective AUROC gain over the best naive baseline ≥ **0.02**, with **95% bootstrap CI lower bound > 0**, **and** Brier ≤ the baseline's. (Absolute AUROC ≥ 0.70 is a secondary catastrophic-degradation floor only.)
+- **NEUTRAL — a legitimate, published result, and the most likely one given the retrospective gain was only ~0.03:** gain < 0.02, or its CI spans 0 → "no added skill over seasonality."
+- **FAILURE:** AUROC below the baseline, **or** absolute AUROC < **0.70**, **or** fewer than **10** scoreable weeks with both outcome classes (reported as inconclusive-underpowered).
 
 ## 12. Revised NCDC data (pre-specified)
 NCDC revises prior weeks. The **primary analysis uses the values as first published / as-logged** (frozen at log and at evaluation). A **sensitivity analysis** repeats the evaluation on the latest revised values. **Both** are reported; the primary verdict is not changed by later revisions.
@@ -81,9 +88,10 @@ Results are published at `/validation` and `/lassa`, and in any manuscript updat
 **Enforced by the workflow:** the logger (`national-forecast-logger.py`) refuses to log a forecast whose outcome window is not in the future (`window_is_future`), is append-only, idempotent per (year, week), and stores a SHA-256 of each forecast.
 **Limitations (NOT tamper-proof — disclosed honestly):** the log is append-only *by convention*, not WORM; there is no hash-chain linking records; and a direct database/SQL write can bypass the logger entirely. Therefore the pre-registration's integrity rests on the **git commit history of this frozen protocol + the append-only JSONL**, not on cryptographic immutability. Model training data predates the forecasts, but for a purely forward forecast (window strictly in the future) leakage is not applicable to the outcome.
 
-## 15. Freeze / sign-off (to be completed by the author)
-- [ ] Author has reviewed and confirmed/adjusted all **«CONFIRM»** items (§2, §10, §11).
-- [ ] Threshold, model version, code commit hash, and dataset hash filled in §2.
-- [ ] Status changed to `FROZEN v1.0` and committed **before** the first scored forecast.
+## 15. Sign-off & pre-season freeze
+- [x] Scientific criteria (§2 fitting rule + frozen threshold, §10 dates, §11 success/neutral/failure) **committed v1.0** by the acting Chief Scientist on the author's delegation, 2026-07-13.
+- [ ] Author (final sign-off): review §11 and amend any value **before** the first scored forecast; amendments are tracked as v1.x in git history.
+- [ ] **Pre-season freeze (one-time, before first forecast):** refresh the series to the current epi-week, then stamp the model code-commit hash and dataset SHA-256 in §2 and bring the automated weekly cadence live (§3).
+- [ ] After the first scored forecast is logged: **no further changes** to §2, §7, or §11.
 
 *Author:* Oluwafemi Idiakhoa · *Contact:* partnerships@gailabai.com
