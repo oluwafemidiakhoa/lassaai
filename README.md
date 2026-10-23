@@ -10,6 +10,8 @@ Open source · MIT License · 2026
 [![Data: NCDC + SORMAS](https://img.shields.io/badge/data-NCDC%20%2B%20SORMAS-orange.svg)](https://ncdc.gov.ng)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21122486.svg)](https://doi.org/10.5281/zenodo.21122486)
 
+> **2026–27 prospective study (protocol v1.1) is frozen.** The eight frozen objects and the freeze manifest are published here byte-identical; see [VERIFY.md](VERIFY.md) to recompute every SHA-256.
+
 ---
 
 ## What LassaAI is (and what it isn't)

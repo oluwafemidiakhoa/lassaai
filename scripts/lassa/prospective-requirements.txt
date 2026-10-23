@@ -1,0 +1,5 @@
+# Frozen Python package environment for the LassaAI 2026-27 prospective study.
+# Python itself is frozen to the exact 3.11.x patch recorded in the one-time freeze manifest.
+numpy==1.26.4
+scikit-learn==1.4.2
+xgboost==2.0.3

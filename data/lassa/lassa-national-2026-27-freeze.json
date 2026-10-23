@@ -1,0 +1,102 @@
+{
+  "baseline_contract": {
+    "confirmatory_comparator_rule": "best AUROC among primary, secondary, seasonal_climatology, seasonal_plus_persistence on the same scoreable weeks",
+    "persistence_probability_mapping_for_brier_ece": "one-feature logistic calibration fit only on epi_year <= 2023",
+    "primary": "recent 4-week case average",
+    "seasonal_climatology": "logistic regression on first+second annual sin/cos harmonics; expanding labelled history only",
+    "seasonal_plus_persistence": "standardized logistic regression on first+second annual harmonics + recent-4-week average + previous-week count + roll4-roll8 trend; expanding labelled history only",
+    "secondary": "previous-week case count"
+  },
+  "endpoint_contract": {
+    "elevated_definition": "sum of confirmed national cases in the next four weeks > 32",
+    "forecast_horizon_weeks": 4,
+    "frozen_threshold_4wk_burden": 32,
+    "operational_alert_probability": 0.5,
+    "risk_bands": {
+      "HIGH": "[0.50, 0.75)",
+      "LOW": "[0.00, 0.25)",
+      "MODERATE": "[0.25, 0.50)",
+      "VERY_HIGH": "[0.75, 1.00]"
+    }
+  },
+  "environment_contract": {
+    "environment_lock_sha256": "9f0994f577d301ff63465795c9754f174fd70f948ace8a2bc37ab291029cdafe",
+    "packages": {
+      "numpy": "1.26.4",
+      "scikit-learn": "1.4.2",
+      "xgboost": "2.0.3"
+    },
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.11.16",
+    "python_implementation": "CPython"
+  },
+  "evaluation_contract": {
+    "bootstrap_replicates": 4000,
+    "bootstrap_seed": 20260922,
+    "ece_bins": 5,
+    "failure": "with a scoreable two-class evaluation, AUROC below the best pre-specified comparator or absolute AUROC < 0.70",
+    "inconclusive_underpowered": "fewer than 10 scoreable weeks or absence of both outcome classes; not evidence of model failure",
+    "interim_readout": "2027-W05",
+    "neutral": "any result that is neither success nor failure; includes gain < 0.02, binding 4-week paired CI spanning 0, Brier worse than the strongest comparator, or an inconclusive-underpowered readout",
+    "primary_readout_after": "2027-W21",
+    "primary_uncertainty": "paired moving-block bootstrap with 4-week blocks",
+    "primary_window": "2026-W45 through 2027-W17",
+    "publish_regardless": true,
+    "readout_code": "scripts/lassa/prospective-readout.py",
+    "sensitivity_uncertainty": "paired moving-block bootstrap with 8-week blocks",
+    "success": "AUROC gain over best pre-specified comparator (persistence or seasonal) >= 0.02; 4-week paired moving-block 95% CI lower bound > 0; Brier <= that comparator; absolute AUROC >= 0.70"
+  },
+  "frozen_at_utc": "2026-09-23T03:12:45.920131+00:00",
+  "git": {
+    "branch": "main",
+    "commit_sha": "1797d581b0755be317043137ee6230167aeb4f83"
+  },
+  "hashes": {
+    "dataset_sha256": "e34fb6c31dcd3ccd8aeacb16b09b34a053bceabcb478d767c6be4051a8c9c29e",
+    "environment_lock_sha256": "9f0994f577d301ff63465795c9754f174fd70f948ace8a2bc37ab291029cdafe",
+    "forecast_code_sha256": "947448afbfbcb123fe0a01c8cd18c67534481e9e491b8b8fc74abc5e958ce9f5",
+    "logger_code_sha256": "3bcc092b1ca73c1b0aa8f557680c4d35541aa869839b4d6ea818d05c0fdb48a2",
+    "outcome_recorder_sha256": "88a342ad059172e1ebb5333cad297ecbec7f3d9ef2122c529bfb31ec892d5db6",
+    "protocol_sha256": "22ee44e4f33b355a513484b89761bc914db4638c9e750c6832c3afaa6fc2c7e9",
+    "readout_code_sha256": "6f04e4ef28eb72fb5b26b4cc2f5f0327c84672a324f7106f569b7a7db072b18a",
+    "source_review_sha256": "909d413a6b0f21ae4d9d0975424b4c543d0759d5b172a813e77a2ecfabf88896"
+  },
+  "model_contract": {
+    "algorithm": "XGBoost classifier",
+    "calibration": {
+      "ece": "5 equal-width probability bins over [0,1]",
+      "model_probability": "raw XGBoost predict_proba; no post-hoc recalibration during the prospective season",
+      "persistence_baseline_probability": "one-feature logistic calibration fit only on epi_year <= 2023",
+      "reliability_curve": "same 5 equal-width bins used for ECE",
+      "seasonal_probabilities": "native logistic-regression predict_proba under expanding-window labelled history"
+    },
+    "features": [
+      "conf_lag1",
+      "conf_lag2",
+      "conf_lag4",
+      "conf_lag8",
+      "roll4",
+      "roll8",
+      "roll_trend",
+      "epi_week",
+      "dry_season"
+    ],
+    "fitting_rule": "expanding window over every labelled week available before forecast time; no manual tuning between weeks",
+    "hyperparameters": {
+      "colsample_bytree": 0.8,
+      "eval_metric": "logloss",
+      "learning_rate": 0.05,
+      "max_depth": 3,
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "random_state": 0,
+      "scale_pos_weight_rule": "n_negative / max(1, n_positive) over currently labelled expanding-window training rows",
+      "subsample": 0.8
+    },
+    "model_version": "national-elevated-transmission-v1"
+  },
+  "protocol_version": "v1.1",
+  "schema_version": "gaialab.lassa-national-freeze.v1",
+  "scientific_boundary": "This freeze establishes prospective study anteriority/integrity only. It does not establish forecast validity, clinical utility, causality, treatment efficacy, or public-health effectiveness.",
+  "study_id": "lassa-national-forecast-2026-27-v1.1"
+}
