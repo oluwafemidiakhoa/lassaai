@@ -100,11 +100,25 @@ gain importance of the frozen model, computed by
 which executes the frozen forecast code on the frozen dataset. The script refuses to run unless both
 hash to the manifest's values.
 
-The figures are only reproducible inside the freeze environment lock
-(CPython 3.11.16, numpy 1.26.4, scikit-learn 1.4.2, xgboost 2.0.3) on
-**Linux x86_64**, as recorded in the manifest. On 2026-10-23 the Linux runs on CPython 3.11.16 and
-3.12.3 were identical, while the Windows build of the same xgboost version fitted a different model
-from the same seed. Both cross-checks are recorded in the file.
+### Platform: results are reproducible only on Linux
+
+- **Canonical environment:** Linux x86_64 (GitHub Actions ubuntu24), CPython 3.11.16, numpy 1.26.4, scikit-learn 1.4.2, xgboost 2.0.3
+  (platform `Linux-6.17.0-1022-azure-x86_64-with-glibc2.39`; the freeze manifest records `Linux-6.17.0-1022-azure-x86_64-with-glibc2.39`).
+  The prospective forecasts run on GitHub Actions `ubuntu-latest`, so the canonical file is produced there too.
+- **Linux:** the computation reproduces exactly across Python 3.11 and 3.12.
+- **Windows: it does not.** The Windows build of the same xgboost version fits a different model from the same seed
+  (dry-season importance 28.1% vs 47.8%). That changes the **forecasts** too, not just the
+  importances (checked on the frozen data: the final-week forecast probability differed), so results are only comparable within
+  the canonical Linux environment.
+
+Every run recorded in the file, with its source in this repository:
+
+| Platform | Python | dry_season gain | vs canonical | Source run |
+|---|---|---|---|---|
+| Linux x86_64 (GitHub Actions ubuntu24) (canonical) | CPython 3.11.16 | 47.8% | n/a | `data/lassa/national-feature-importance.json` |
+| Linux x86_64 (WSL2) | CPython 3.11.16 | 47.8% | identical | `data/lassa/feature-importance-runs/linux-wsl2-cpython-3.11.16.json` |
+| Linux x86_64 (WSL2) | CPython 3.12.3 | 47.8% | identical | `data/lassa/feature-importance-runs/linux-wsl2-cpython-3.12.3.json` |
+| Windows x86_64 | CPython 3.12.10 | 28.1% | different | `data/lassa/feature-importance-runs/windows-cpython-3.12.10.json` |
 
 In this repository the dataset at `data/lassa/lassa_fever_timeseries_full.csv` *is* the frozen
 snapshot, so pass it directly (requires [uv](https://docs.astral.sh/uv/)):

@@ -38,6 +38,8 @@ Lassa fever is endemic in Nigeria and the national response is largely reactive.
 
 ## National early-warning model
 
+> **Version note.** This section describes the **v1.0 retrospective development model** reported in the preprint (trained on weeks up to 2023, tested on the 2024 hold-out). The **frozen v1.1 prospective study** uses the same nine features but is refit on all labelled weeks, adds seasonal comparators and dependence-aware uncertainty, and is judged only by its pre-registered rules: see [`docs/lassa/PROSPECTIVE_PROTOCOL_LASSA.md`](docs/lassa/PROSPECTIVE_PROTOCOL_LASSA.md) and [VERIFY.md](VERIFY.md).
+
 ### Data (real, triple-cross-validated)
 - **National weekly incidence, 2020–2025** — NCDC Weekly Epidemiological Reports, via a provenance-tracked public compilation *and* our own independent re-extraction (`scripts/lassa/rebuild-ncdc-real.py`). The two extractions and NCDC's published annual totals agree within **~1%** (e.g. 2020: 1,190 vs 1,189; 2024: 1,311 vs 1,309).
 - **Annual confirmed cases:** 2020 = 1,190 · 2021 = 511 · 2022 = 1,042 · 2023 = 1,271 · 2024 = 1,311 · 2025 = 1,131 (total 6,456).
@@ -48,7 +50,7 @@ Lassa fever is endemic in Nigeria and the national response is largely reactive.
 - **Target:** will the next 4 weeks carry an *above-median* confirmed-case burden (an "elevated-transmission week")? Chosen because national weekly incidence is never zero, so a ">0/>5" target is trivially always-true. Balanced target: 56% positive.
 - **Model:** XGBoost, 9 features (lagged/rolling confirmed counts, trend, epi-week, dry-season flag). No weather (national-average weather is not epidemiologically meaningful).
 - **Split:** strictly temporal — train ≤2023, test 2024, 2025 reserved.
-- **Benchmarked against naive persistence baselines** (recent 4-week average; previous-week count).
+- **Benchmarked against naive persistence baselines** (recent 4-week average; previous-week count). *(v1.0. The frozen v1.1 study adds a seasonal-climatology and a seasonal+persistence comparator and is judged against the strongest of the four.)*
 
 ### Performance — read the model *and* the baseline together
 
@@ -58,13 +60,13 @@ Lassa fever is endemic in Nigeria and the national response is largely reactive.
 | Naive: recent 4-week average | 0.849 | — | — |
 | Naive: previous-week count | 0.848 | — | — |
 
-The model beats the best naive baseline by only **~0.03 AUROC**. Most of the discrimination is **seasonality and recent incidence** — which the baselines also capture. The top predictor is the **dry-season flag (≈53% gain importance)**, i.e. the model is learning the real Nov–Apr season, not a data artefact. This is a modest, believable result, **not a breakthrough.**
+The model beats the best naive baseline by only **~0.03 AUROC**. Most of the discrimination is **seasonality and recent incidence** — which the baselines also capture. In this 2024 development model the top predictor is the **dry-season flag (≈53% gain importance, as reported in the preprint)**, i.e. the model is learning the real Nov–Apr season, not a data artefact. In the **frozen v1.1 model** (refit on all labelled weeks through 2026-W36) the dry-season flag is still the top single feature, with a different share; see [`data/lassa/national-feature-importance.json`](data/lassa/national-feature-importance.json) and [VERIFY.md](VERIFY.md). This is a modest, believable result, **not a breakthrough.**
 
 ### Honest limitations
 - Modest gain over a naive baseline; retrospective metrics overstate operational value.
 - **National, not per-state.** Per-state weekly counts are published by NCDC as image tables (not text-extractable); the per-state view on the dashboard is an **illustrative prototype**, not validated. Per-state weekly forecasting is future work (SORMAS gives a 2018–2021 per-state view).
 - Confirmed counts under-report true incidence.
-- **No prospective validation yet** — the genuine test. Append-only forecast logging (`data/lassa/prospective-log.jsonl`) is in place to support it.
+- **No prospective result yet** — the genuine test. The 2026–27 study (protocol v1.1) was **frozen on 2026-09-23**; its scored forecasts and outcomes go to hash-chained ledgers, with an interim readout at 2027-W05 and the primary readout after 2027-W21. (`data/lassa/prospective-log.jsonl` is the earlier v1.0 log, not the v1.1 study record.)
 
 ---
 
@@ -90,6 +92,8 @@ Computational evidence tiers only — not clinical efficacy.
 
 ## Reproduce it
 
+> These steps reproduce the **v1.0 retrospective results** in the preprint. To verify the **frozen v1.1 study** (the eight frozen objects and their SHA-256 hashes) and its feature importance, use [VERIFY.md](VERIFY.md); v1.1 requires CPython 3.11.16 with the pins in `scripts/lassa/prospective-requirements.txt`, on Linux x86_64.
+
 ```bash
 git clone https://github.com/oluwafemidiakhoa/lassaai.git
 cd lassaai
@@ -105,7 +109,7 @@ python scripts/lassa/build-real-national.py
 python scripts/lassa/generate-figures-real.py
 ```
 
-The validated national series used for the paper is `data/lassa/lassa_fever_timeseries_full.csv` (NCDC WER compilation, 2020–2025).
+`data/lassa/lassa_fever_timeseries_full.csv` is now the **frozen v1.1 snapshot** (2020-W1 to 2026-W36), byte-identical to the file the freeze manifest hashes. The paper used its 2020–2025 weeks. Re-running the v1.0 pipeline on this snapshot (2026-10-24, CPython 3.11.16 with the v1.1 package pins) reproduces the split (201 training / 52 test weeks), the threshold and both naive baselines exactly (AUROC 0.849 and 0.848), but the XGBoost model scores AUROC 0.891 rather than the published 0.880, and its dry-season importance is 54.1% rather than ≈53%: the v1.0 run recorded neither its library versions nor its platform, and the XGBoost fit depends on both (see VERIFY.md on platform). Treat the preprint figures as the published record and the re-run as a check.
 
 > **Note on a retracted synthetic version.** An earlier iteration used a **synthetic** per-state series (annual national totals distributed across weeks/states by a fixed formula, with *inverted* seasonality) and reported a misleadingly high, near-tautological AUROC. Those data files and the scripts that generated them (`collect-ncdc-data.py`, `build-features.py`, `train-model.py`, `merge-datasets.py`, and the synthetic `lassa-merged.csv` / `features.csv` / `ncdc-cases.csv`) have been **removed** from the repository. They remain in the git history for full transparency about the correction. Do not resurrect them — use the real pipeline above.
 

@@ -164,6 +164,8 @@ The author thanks Professor Robert F. Garry (Tulane University) for a helpful di
 
 **Figure 2. ROC — model versus naive baseline (2024 out-of-time hold-out).** ROC for the XGBoost model (AUROC = 0.880) and a naive baseline using only the recent 4-week case average (AUROC = 0.849). The curves are close: the model improves on trivial persistence by ~0.03 AUROC. Target = elevated (above-median) confirmed burden over the next four weeks.
 
+> **Version note (2026-10):** Figure 3 shows the **2024 development model** described in this manuscript (train ≤2023, test 2024). It is not the frozen v1.1 prospective model; that model's importance is in `data/lassa/national-feature-importance.json` (see `VERIFY.md`).
+
 ![](figures/figure3_feature_importance.png)
 
 **Figure 3. Feature importance (gain-based).** The dry-season flag is the dominant predictor (≈53%), followed by the rolling-trend term, epidemiological week, and recent lags — epidemiologically consistent with the November–April Lassa season.

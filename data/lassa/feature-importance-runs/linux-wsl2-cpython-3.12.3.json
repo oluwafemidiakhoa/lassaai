@@ -1,0 +1,113 @@
+{
+  "schema_version": "gaialab.lassa-national-feature-importance.v1",
+  "study_id": "lassa-national-forecast-2026-27-v1.1",
+  "model_version": "national-elevated-transmission-v1",
+  "description": "Gain importance of the frozen v1.1 national model fitted on every labelled week of the frozen dataset. Describes what the fitted model relies on; not a causal or prospective claim.",
+  "importance_type": "gain",
+  "normalized": true,
+  "training": {
+    "labelled_weeks": 337,
+    "data_through": {
+      "epi_year": 2026,
+      "epi_week": 36
+    }
+  },
+  "provenance": {
+    "dataset_sha256": "e34fb6c31dcd3ccd8aeacb16b09b34a053bceabcb478d767c6be4051a8c9c29e",
+    "forecast_code_sha256": "947448afbfbcb123fe0a01c8cd18c67534481e9e491b8b8fc74abc5e958ce9f5",
+    "freeze_commit_sha": "1797d581b0755be317043137ee6230167aeb4f83",
+    "script": "scripts/lassa/national-feature-importance.py",
+    "environment": {
+      "python": "3.12.3",
+      "python_implementation": "CPython",
+      "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "numpy": "1.26.4",
+      "scikit-learn": "1.4.2",
+      "xgboost": "2.0.3"
+    },
+    "within_freeze_environment_lock": false,
+    "regenerate": "git show 1797d581b0755be317043137ee6230167aeb4f83:data/lassa/lassa_fever_timeseries_full.csv > /tmp/frozen.csv && uv venv --python 3.11.16 /tmp/lassa-fi && uv pip install --python /tmp/lassa-fi -r scripts/lassa/prospective-requirements.txt && /tmp/lassa-fi/bin/python scripts/lassa/national-feature-importance.py /tmp/frozen.csv",
+    "cross_checks": []
+  },
+  "features": [
+    {
+      "feature": "dry_season",
+      "importance": 0.4778
+    },
+    {
+      "feature": "conf_lag1",
+      "importance": 0.1447
+    },
+    {
+      "feature": "epi_week",
+      "importance": 0.0672
+    },
+    {
+      "feature": "roll4",
+      "importance": 0.0664
+    },
+    {
+      "feature": "roll8",
+      "importance": 0.0539
+    },
+    {
+      "feature": "conf_lag2",
+      "importance": 0.0536
+    },
+    {
+      "feature": "roll_trend",
+      "importance": 0.0497
+    },
+    {
+      "feature": "conf_lag8",
+      "importance": 0.0445
+    },
+    {
+      "feature": "conf_lag4",
+      "importance": 0.0424
+    }
+  ],
+  "grouped": {
+    "seasonal": {
+      "features": [
+        "dry_season",
+        "epi_week"
+      ],
+      "importance": 0.5449
+    },
+    "case_history": {
+      "features": [
+        "conf_lag1",
+        "conf_lag2",
+        "conf_lag4",
+        "conf_lag8",
+        "roll4",
+        "roll8",
+        "roll_trend"
+      ],
+      "importance": 0.4551
+    }
+  },
+  "run": {
+    "environment": {
+      "python": "3.12.3",
+      "python_implementation": "CPython",
+      "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "numpy": "1.26.4",
+      "scikit-learn": "1.4.2",
+      "xgboost": "2.0.3"
+    },
+    "within_freeze_environment_lock": false,
+    "importance_raw": {
+      "dry_season": 0.4777747690677643,
+      "conf_lag1": 0.14468038082122803,
+      "epi_week": 0.06715170294046402,
+      "roll4": 0.0663955956697464,
+      "roll8": 0.053877267986536026,
+      "conf_lag2": 0.05360068380832672,
+      "roll_trend": 0.04968884959816933,
+      "conf_lag8": 0.04445331543684006,
+      "conf_lag4": 0.042377397418022156
+    }
+  }
+}

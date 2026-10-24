@@ -20,7 +20,8 @@
     "environment": {
       "python": "3.11.16",
       "python_implementation": "CPython",
-      "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "platform_description": "Linux x86_64 (GitHub Actions ubuntu24)",
       "numpy": "1.26.4",
       "scikit-learn": "1.4.2",
       "xgboost": "2.0.3"
@@ -29,30 +30,85 @@
     "regenerate": "git show 1797d581b0755be317043137ee6230167aeb4f83:data/lassa/lassa_fever_timeseries_full.csv > /tmp/frozen.csv && uv venv --python 3.11.16 /tmp/lassa-fi && uv pip install --python /tmp/lassa-fi -r scripts/lassa/prospective-requirements.txt && /tmp/lassa-fi/bin/python scripts/lassa/national-feature-importance.py /tmp/frozen.csv",
     "cross_checks": [
       {
+        "source": "data/lassa/feature-importance-runs/linux-wsl2-cpython-3.11.16.json",
+        "environment": {
+          "python": "3.11.16",
+          "python_implementation": "CPython",
+          "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "numpy": "1.26.4",
+          "scikit-learn": "1.4.2",
+          "xgboost": "2.0.3",
+          "platform_description": "Linux x86_64 (WSL2)"
+        },
+        "within_freeze_environment_lock": true,
+        "identical_full_precision_importances": true,
+        "max_abs_difference": 0.0,
+        "importance_raw": {
+          "dry_season": 0.4777747690677643,
+          "conf_lag1": 0.14468038082122803,
+          "epi_week": 0.06715170294046402,
+          "roll4": 0.0663955956697464,
+          "roll8": 0.053877267986536026,
+          "conf_lag2": 0.05360068380832672,
+          "roll_trend": 0.04968884959816933,
+          "conf_lag8": 0.04445331543684006,
+          "conf_lag4": 0.042377397418022156
+        },
+        "grouped_seasonal": 0.5449264720082283
+      },
+      {
+        "source": "data/lassa/feature-importance-runs/linux-wsl2-cpython-3.12.3.json",
         "environment": {
           "python": "3.12.3",
           "python_implementation": "CPython",
           "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
           "numpy": "1.26.4",
           "scikit-learn": "1.4.2",
-          "xgboost": "2.0.3"
+          "xgboost": "2.0.3",
+          "platform_description": "Linux x86_64 (WSL2)"
         },
         "within_freeze_environment_lock": false,
         "identical_full_precision_importances": true,
-        "max_abs_difference": 0.0
+        "max_abs_difference": 0.0,
+        "importance_raw": {
+          "dry_season": 0.4777747690677643,
+          "conf_lag1": 0.14468038082122803,
+          "epi_week": 0.06715170294046402,
+          "roll4": 0.0663955956697464,
+          "roll8": 0.053877267986536026,
+          "conf_lag2": 0.05360068380832672,
+          "roll_trend": 0.04968884959816933,
+          "conf_lag8": 0.04445331543684006,
+          "conf_lag4": 0.042377397418022156
+        },
+        "grouped_seasonal": 0.5449264720082283
       },
       {
+        "source": "data/lassa/feature-importance-runs/windows-cpython-3.12.10.json",
         "environment": {
           "python": "3.12.10",
           "python_implementation": "CPython",
           "platform": "Windows-11-10.0.26100-SP0",
           "numpy": "1.26.4",
           "scikit-learn": "1.4.2",
-          "xgboost": "2.0.3"
+          "xgboost": "2.0.3",
+          "platform_description": "Windows x86_64"
         },
         "within_freeze_environment_lock": false,
         "identical_full_precision_importances": false,
-        "max_abs_difference": 0.19726842641830444
+        "max_abs_difference": 0.19726842641830444,
+        "importance_raw": {
+          "dry_season": 0.28050634264945984,
+          "conf_lag1": 0.2258298397064209,
+          "epi_week": 0.091977559030056,
+          "roll4": 0.08245644718408585,
+          "roll8": 0.0792880654335022,
+          "roll_trend": 0.06437814235687256,
+          "conf_lag8": 0.06216644495725632,
+          "conf_lag2": 0.061920855194330215,
+          "conf_lag4": 0.051476288586854935
+        },
+        "grouped_seasonal": 0.37248390167951584
       }
     ]
   },
@@ -119,7 +175,8 @@
     "environment": {
       "python": "3.11.16",
       "python_implementation": "CPython",
-      "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "platform_description": "Linux x86_64 (GitHub Actions ubuntu24)",
       "numpy": "1.26.4",
       "scikit-learn": "1.4.2",
       "xgboost": "2.0.3"

@@ -27,9 +27,12 @@ Optional:
                        with whether its full-precision importances are identical to this run's
                        (repeatable)
 
-Platform matters: on 2026-10-23 the Linux runs (CPython 3.11.16 and 3.12.3) were identical, while the
-Windows build of the same xgboost 2.0.3 fitted a different model from the same seed (dry_season gain
-0.281 vs 0.478). The freeze manifest records Linux, so the canonical file comes from Linux.
+Platform matters: on 2026-10-23 the Linux runs (CPython 3.11.16 and 3.12.3, WSL2) were identical,
+while the Windows build of the same xgboost 2.0.3 fitted a different model from the same seed
+(dry_season gain 0.281 vs 0.478; the final-week forecast probability also differed, 0.788 vs 0.752).
+The prospective forecasts run on GitHub Actions ubuntu-latest, so the canonical file is produced
+there too, by .github/workflows/lassa-feature-importance.yml; the WSL2 and Windows runs kept in
+data/lassa/feature-importance-runs/ are recorded as cross-checks.
 
 Importance is XGBoost's sklearn feature_importances_ (importance_type "gain", normalised to sum 1).
 It describes what the fitted model relies on; it is not a causal or prospective claim.
@@ -59,12 +62,30 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def describe_platform(platform_string, actions_image=None):
+    """Plain description of a recorded platform.platform() string, e.g. 'Linux x86_64 (WSL2)'."""
+    s = str(platform_string or "")
+    arch = "x86_64" if ("x86_64" in s or "AMD64" in s or s.startswith("Windows")) else "unknown arch"
+    if s.startswith("Windows"):
+        return f"Windows {arch}"
+    if s.startswith("Linux"):
+        if "microsoft" in s.lower() or "wsl" in s.lower():
+            return f"Linux {arch} (WSL2)"
+        if actions_image:
+            return f"Linux {arch} (GitHub Actions {actions_image})"
+        return f"Linux {arch}"
+    return s or "unknown"
+
+
 def environment():
     import numpy, sklearn, xgboost  # noqa: E401
+    on_actions = os.environ.get("GITHUB_ACTIONS") == "true"
+    image = os.environ.get("ImageOS") or os.environ.get("RUNNER_OS") if on_actions else None
     return {
         "python": platform.python_version(),
         "python_implementation": platform.python_implementation(),
         "platform": platform.platform(),
+        "platform_description": describe_platform(platform.platform(), image),
         "numpy": numpy.__version__,
         "scikit-learn": sklearn.__version__,
         "xgboost": xgboost.__version__,
@@ -124,11 +145,17 @@ def main():
     cross_checks = []
     for path in args.cross_check:
         other = json.loads(Path(path).read_text(encoding="utf-8"))["run"]
+        other_env = dict(other["environment"])
+        other_env.setdefault("platform_description", describe_platform(other_env.get("platform")))
+        other_seasonal = sum(other["importance_raw"][f] for f in SEASONAL)
         cross_checks.append({
-            "environment": other["environment"],
+            "source": Path(path).resolve().relative_to(ROOT).as_posix() if Path(path).resolve().is_relative_to(ROOT) else Path(path).name,
+            "environment": other_env,
             "within_freeze_environment_lock": other["within_freeze_environment_lock"],
             "identical_full_precision_importances": other["importance_raw"] == run["importance_raw"],
             "max_abs_difference": max(abs(other["importance_raw"][f] - gain[f]) for f in feats),
+            "importance_raw": other["importance_raw"],
+            "grouped_seasonal": other_seasonal,
         })
 
     out = {
