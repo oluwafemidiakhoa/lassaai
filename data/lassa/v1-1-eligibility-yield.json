@@ -1,0 +1,239 @@
+{
+  "schema": "gaialab.lassa-v1-1-eligibility-yield.v1",
+  "study_id": "lassa-national-forecast-2026-27-v1.1",
+  "lead_weeks": 1,
+  "primary_window": "2026-W45 through 2027-W17",
+  "primary_window_weeks": 26,
+  "primary_window_note": "ISO year 2026 has 53 weeks, so the window holds 26 ISO weeks; 25 if NCDC numbers 2026 with 52 weeks. NCDC numbering for 2026 is unconfirmed until January 2027.",
+  "eligibility_rule": "a data-through week is eligible only if its NCDC report is public, and the forecast logged, before the window starts: publication lag < 1 day(s) after the ISO week-end (Sunday), i.e. on or before the Sunday the week ends",
+  "max_tolerable_lag_days_exclusive": 1,
+  "evidence": {
+    "first_observation_collector": {
+      "release_events": 1,
+      "weeks": [
+        {
+          "week": "2026-W39",
+          "first_observed_at_utc": "2026-10-12T16:50:22.904Z",
+          "lag_lower_days": 13,
+          "lag_upper_days": 15
+        },
+        {
+          "week": "2026-W40",
+          "first_observed_at_utc": "2026-10-12T16:50:22.904Z",
+          "lag_lower_days": 6,
+          "lag_upper_days": 8
+        }
+      ],
+      "meeting_rule": 0,
+      "source": [
+        "data/lassa/ncdc-first-observation-ledger.jsonl",
+        "data/lassa/ncdc-first-observation-baseline.json"
+      ]
+    },
+    "upload_time_proxy": {
+      "n_weeks": 36,
+      "min_days": 9,
+      "median_days": 17,
+      "p90_days": 25,
+      "max_days": 44,
+      "source": "docs/lassa/LASSA_V1_1_FEASIBILITY_AND_INTEGRITY_ASSESSMENT_2026-10-21.md section 4 (PR #447 probe)",
+      "meeting_rule": 0
+    }
+  },
+  "scenarios": [
+    {
+      "name": "measured",
+      "description": "lowest lag our own collector has bounded (lower bound of the fastest observed release)",
+      "lag_days": 6,
+      "eligible_windows": 0,
+      "of": 26
+    },
+    {
+      "name": "best_case",
+      "description": "fastest value in any evidence source (collector lower bound or upload-time proxy minimum)",
+      "lag_days": 6,
+      "eligible_windows": 0,
+      "of": 26
+    },
+    {
+      "name": "typical_proxy",
+      "description": "upload-time proxy median",
+      "lag_days": 17,
+      "eligible_windows": 0,
+      "of": 26
+    },
+    {
+      "name": "worst_case",
+      "description": "slowest value in any evidence source (upload-time proxy maximum)",
+      "lag_days": 44,
+      "eligible_windows": 0,
+      "of": 26
+    }
+  ],
+  "expected_eligible_windows": {
+    "best": 0,
+    "worst": 0,
+    "of": 26
+  },
+  "min_scoreable_weeks": 10,
+  "projected_readout": "neutral_inconclusive_underpowered",
+  "protocol_reference": "docs/lassa/PROSPECTIVE_PROTOCOL_LASSA.md §11: fewer than 10 scoreable weeks is reported specifically as inconclusive-underpowered and does not count as evidence that the model failed",
+  "windows": [
+    {
+      "data_through": "2026-W45",
+      "window_start": "2026-11-09",
+      "window_end": "2026-12-06",
+      "last_loggable_day": "2026-11-08"
+    },
+    {
+      "data_through": "2026-W46",
+      "window_start": "2026-11-16",
+      "window_end": "2026-12-13",
+      "last_loggable_day": "2026-11-15"
+    },
+    {
+      "data_through": "2026-W47",
+      "window_start": "2026-11-23",
+      "window_end": "2026-12-20",
+      "last_loggable_day": "2026-11-22"
+    },
+    {
+      "data_through": "2026-W48",
+      "window_start": "2026-11-30",
+      "window_end": "2026-12-27",
+      "last_loggable_day": "2026-11-29"
+    },
+    {
+      "data_through": "2026-W49",
+      "window_start": "2026-12-07",
+      "window_end": "2027-01-03",
+      "last_loggable_day": "2026-12-06"
+    },
+    {
+      "data_through": "2026-W50",
+      "window_start": "2026-12-14",
+      "window_end": "2027-01-10",
+      "last_loggable_day": "2026-12-13"
+    },
+    {
+      "data_through": "2026-W51",
+      "window_start": "2026-12-21",
+      "window_end": "2027-01-17",
+      "last_loggable_day": "2026-12-20"
+    },
+    {
+      "data_through": "2026-W52",
+      "window_start": "2026-12-28",
+      "window_end": "2027-01-24",
+      "last_loggable_day": "2026-12-27"
+    },
+    {
+      "data_through": "2026-W53",
+      "window_start": "2027-01-04",
+      "window_end": "2027-01-31",
+      "last_loggable_day": "2027-01-03"
+    },
+    {
+      "data_through": "2027-W01",
+      "window_start": "2027-01-11",
+      "window_end": "2027-02-07",
+      "last_loggable_day": "2027-01-10"
+    },
+    {
+      "data_through": "2027-W02",
+      "window_start": "2027-01-18",
+      "window_end": "2027-02-14",
+      "last_loggable_day": "2027-01-17"
+    },
+    {
+      "data_through": "2027-W03",
+      "window_start": "2027-01-25",
+      "window_end": "2027-02-21",
+      "last_loggable_day": "2027-01-24"
+    },
+    {
+      "data_through": "2027-W04",
+      "window_start": "2027-02-01",
+      "window_end": "2027-02-28",
+      "last_loggable_day": "2027-01-31"
+    },
+    {
+      "data_through": "2027-W05",
+      "window_start": "2027-02-08",
+      "window_end": "2027-03-07",
+      "last_loggable_day": "2027-02-07"
+    },
+    {
+      "data_through": "2027-W06",
+      "window_start": "2027-02-15",
+      "window_end": "2027-03-14",
+      "last_loggable_day": "2027-02-14"
+    },
+    {
+      "data_through": "2027-W07",
+      "window_start": "2027-02-22",
+      "window_end": "2027-03-21",
+      "last_loggable_day": "2027-02-21"
+    },
+    {
+      "data_through": "2027-W08",
+      "window_start": "2027-03-01",
+      "window_end": "2027-03-28",
+      "last_loggable_day": "2027-02-28"
+    },
+    {
+      "data_through": "2027-W09",
+      "window_start": "2027-03-08",
+      "window_end": "2027-04-04",
+      "last_loggable_day": "2027-03-07"
+    },
+    {
+      "data_through": "2027-W10",
+      "window_start": "2027-03-15",
+      "window_end": "2027-04-11",
+      "last_loggable_day": "2027-03-14"
+    },
+    {
+      "data_through": "2027-W11",
+      "window_start": "2027-03-22",
+      "window_end": "2027-04-18",
+      "last_loggable_day": "2027-03-21"
+    },
+    {
+      "data_through": "2027-W12",
+      "window_start": "2027-03-29",
+      "window_end": "2027-04-25",
+      "last_loggable_day": "2027-03-28"
+    },
+    {
+      "data_through": "2027-W13",
+      "window_start": "2027-04-05",
+      "window_end": "2027-05-02",
+      "last_loggable_day": "2027-04-04"
+    },
+    {
+      "data_through": "2027-W14",
+      "window_start": "2027-04-12",
+      "window_end": "2027-05-09",
+      "last_loggable_day": "2027-04-11"
+    },
+    {
+      "data_through": "2027-W15",
+      "window_start": "2027-04-19",
+      "window_end": "2027-05-16",
+      "last_loggable_day": "2027-04-18"
+    },
+    {
+      "data_through": "2027-W16",
+      "window_start": "2027-04-26",
+      "window_end": "2027-05-23",
+      "last_loggable_day": "2027-04-25"
+    },
+    {
+      "data_through": "2027-W17",
+      "window_start": "2027-05-03",
+      "window_end": "2027-05-30",
+      "last_loggable_day": "2027-05-02"
+    }
+  ]
+}

@@ -11,6 +11,33 @@ freeze checkable here is that each published file hashes to the value the manife
 
 The freeze establishes prospective-study anteriority and integrity only. It does not establish forecast validity, clinical utility, causality, treatment efficacy, or public-health effectiveness.
 
+## Read this first: what the 2026–27 study can deliver
+
+**We expect the 2026–27 prospective study to end as inconclusive–underpowered, and we are saying so before the season starts.**
+
+Whether a week can be forecast depends on when NCDC publishes it. The frozen forecast code sets the
+four-week window to start the day after the last data week ends
+(`scripts/lassa/national-forecast-now.py`: `window_start = last_end + timedelta(days=1)`), and protocol §5
+excludes any week that could not be logged before its outcome window began. So a week is eligible only if
+NCDC publishes its report **by the Sunday that week ends**. No evidence we hold shows NCDC publishing that
+fast: our own collector timed the fastest release at **6–8 days** after the week ended, and an upload-time
+measure across **36** weeks of 2026 ranged from **9 to 44 days** (median 17).
+
+| Primary window 2026-W45 to 2027-W17 (26 ISO weeks) | Expected eligible windows |
+|---|---|
+| At the lag we measured (6 days, lower bound) | **0 of 26** |
+| Best case (fastest value in any evidence: 6 days) | **0 of 26** |
+| Worst case (slowest value in any evidence: 44 days) | **0 of 26** |
+
+The protocol needs at least **10** scoreable weeks. An underpowered readout is a **pre-specified outcome**
+of the protocol (§11: "reported specifically as inconclusive-underpowered and does not count as evidence
+that the model failed"). It is **not evidence that the model failed**: it means the v1.1 design cannot be
+scored at NCDC's publication speed. We will publish it as that, and we will not change v1.1 to rescue it.
+A different forecast lead would be a new, separately versioned study.
+
+The computation is in [`data/lassa/v1-1-eligibility-yield.json`](data/lassa/v1-1-eligibility-yield.json),
+stated 2026-10-25; its `source` paths refer to the development repository, where the first-observation ledger lives. The window has 25 weeks if NCDC numbers 2026 with 52 weeks; the answer is the same.
+
 ## The eight frozen objects
 
 | Manifest key | File in this repository | What it is | SHA-256 (from the manifest) |
