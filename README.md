@@ -11,6 +11,8 @@ Open source · MIT License · 2026
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21122486.svg)](https://doi.org/10.5281/zenodo.21122486)
 
 > **2026–27 prospective study (protocol v1.1) is frozen.** The eight frozen objects and the freeze manifest are published here byte-identical; see [VERIFY.md](VERIFY.md) to recompute every SHA-256.
+>
+> **A revised protocol (v1.2) is published as a draft for comment:** [`docs/lassa/v1.2-draft/`](docs/lassa/v1.2-draft/README.md). It is **not frozen, not approved and not active**, and it does not change v1.1.
 
 ---
 
