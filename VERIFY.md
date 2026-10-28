@@ -159,3 +159,30 @@ python3 -c "import json;a=json.load(open('data/lassa/national-feature-importance
 ```
 
 Importance describes what the fitted model relies on; it is not a causal or prospective claim.
+
+## 3. Comparing the weekly series with NCDC's PDFs
+
+The weekly values in the series are **cumulative differences**: the change in NCDC's 2026
+year-to-date confirmed total from one situation report to the next. Each report also states a
+**narrative** weekly count ("In week N, the number of new confirmed cases … to K"). The two can
+differ, because the cumulative total also absorbs cases added late or reclassified from earlier
+weeks. They measure different things; neither is an error. The series keeps the cumulative
+difference because the frozen protocol's refresh specifies it, and it reconciles exactly to NCDC's
+official cumulative total.
+
+Every series week from 2026-W37, the first week after the freeze, is recorded in
+[`data/lassa/ncdc-weekly-count-reconciliation.jsonl`](data/lassa/ncdc-weekly-count-reconciliation.jsonl)
+(append-only, hash-chained). Each record gives both counts, the cumulative totals, and the report
+URL with its SHA-256:
+
+| Week | Cumulative difference (series) | Narrative count | Difference |
+|---|---|---|---|
+| 2026-W37 | 18 | 17 | +1 |
+| 2026-W38 | 11 | 11 | 0 |
+| 2026-W39 | 19 | 13 | +6 |
+| 2026-W40 | 4 | 3 | +1 |
+
+The CSV in this repository is the **frozen snapshot**, which ends at 2026-W36, so these later
+weeks are not in it. 2026 weeks 1–36 were not checked against the narrative counts, so
+differences there are possible and unrecorded. The reconciliation covers confirmed counts, which
+define the study endpoint; suspected counts can differ in the same way.
